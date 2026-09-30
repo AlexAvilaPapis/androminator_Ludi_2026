@@ -1,10 +1,12 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarBehaviour : MonoBehaviour
 {
     [SerializeField] LayerMask m_CollisionMask;
-    public GameObject[] m_Wheels = null;
-    public GameObject m_Body = null;
+    [SerializeField] GameObject m_Body = null;
+    [SerializeField] GameObject m_WheelPrefab = null;
 
     Rigidbody m_CarRigidbody;
 
@@ -18,7 +20,12 @@ public class CarBehaviour : MonoBehaviour
     float m_BodyWeight = 1.0f;
     Mesh m_BodyMesh;
     Material m_BodyMaterial;
+    int m_FrontWheelsAmount = 2;
+    int m_BackWheelsAmount = 2;
+    Vector3 m_FrontWheelPosition = new Vector3(0.8f, -0.5f, 1.0f);
+    Vector3 m_BackWheelPosition = new Vector3(0.8f, -0.5f, -1.0f);
     // ---------------------------
+    List<GameObject> m_Wheels;
 
 
 
@@ -43,6 +50,8 @@ public class CarBehaviour : MonoBehaviour
     private void Awake()
     {
         m_CarRigidbody = GetComponent<Rigidbody>();
+
+        m_Wheels = new List<GameObject>();
     }
 
     private void Start()
@@ -96,13 +105,46 @@ public class CarBehaviour : MonoBehaviour
         m_BodyMeshFilter    = m_Body.GetComponent<MeshFilter>();
         m_BodyRenderer      = m_Body.GetComponent<Renderer>();
 
-        m_BodyWeight        = m_BodyBehaviour.m_BodyParams.m_BodyWeight;
-        m_BodyMesh          = m_BodyBehaviour.m_BodyParams.m_BodyMesh;
-        m_BodyMaterial      = m_BodyBehaviour.m_BodyParams.m_BodyMaterial;
+        m_BodyWeight            = m_BodyBehaviour.m_BodyParams.m_BodyWeight;
+        m_BodyMesh              = m_BodyBehaviour.m_BodyParams.m_BodyMesh;
+        m_BodyMaterial          = m_BodyBehaviour.m_BodyParams.m_BodyMaterial;
+        m_FrontWheelsAmount     = m_BodyBehaviour.m_BodyParams.m_FrontWheelsAmount;
+        m_BackWheelsAmount      = m_BodyBehaviour.m_BodyParams.m_BackWheelsAmount;
+        m_FrontWheelPosition    = m_BodyBehaviour.m_BodyParams.m_FrontWheelPosition;
+        m_BackWheelPosition     = m_BodyBehaviour.m_BodyParams.m_BackWheelPosition;
 
         m_CarRigidbody.mass         = m_BodyWeight;
         m_BodyMeshFilter.mesh       = m_BodyMesh;
         m_BodyRenderer.material     = m_BodyMaterial;
+
+        int l_FrontWheelsAmount = m_FrontWheelsAmount;
+        int l_BackWheelsAmount = m_BackWheelsAmount;
+        Vector3 l_FrontWheelPos = m_FrontWheelPosition;
+        Vector3 l_BackWheelPos = m_BackWheelPosition;
+        // BORRAR TODAS LAS RUEDAS DE m_Wheels          AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        // CREAR FUNCION ERASE WHEELS
+
+        m_Wheels.Clear();
+
+        // CREAR FUNCION SPAWN WHEELS
+        while (l_FrontWheelsAmount > 0)
+        {
+            GameObject l_Wheel = Instantiate(m_WheelPrefab);
+            l_Wheel.transform.parent = transform;
+            l_Wheel.transform.localPosition = l_FrontWheelPos;
+            m_Wheels.Add(l_Wheel);
+            l_FrontWheelPos.x *= -1;
+            l_FrontWheelsAmount -= 1;
+        }
+        while (l_BackWheelsAmount > 0)
+        {
+            GameObject l_Wheel = Instantiate(m_WheelPrefab);
+            l_Wheel.transform.parent = transform;
+            l_Wheel.transform.localPosition = l_BackWheelPos;
+            m_Wheels.Add(l_Wheel);
+            l_BackWheelPos.x *= -1;
+            l_BackWheelsAmount -= 1;
+        }
     }
     void GetWheelParams(GameObject i_Wheel)
     {
