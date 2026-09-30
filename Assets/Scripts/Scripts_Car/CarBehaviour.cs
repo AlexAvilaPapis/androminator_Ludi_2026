@@ -83,6 +83,10 @@ public class CarBehaviour : MonoBehaviour
 
                 m_WheelMeshTransform.position = m_WheelRayHit.point + (m_WheelTransform.up * (m_SpringRestDistance));
             }
+            else
+            {
+                m_WheelMeshTransform.position = Vector3.Lerp(m_WheelMeshTransform.position, m_WheelTransform.position + (-m_WheelTransform.up * (m_SpringRestDistance)), Time.deltaTime);
+            }
         }
     }
 
