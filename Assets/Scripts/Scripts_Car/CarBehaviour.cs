@@ -25,7 +25,7 @@ public class CarBehaviour : MonoBehaviour
     Vector3 m_FrontWheelPosition = new Vector3(0.8f, -0.5f, 1.0f);
     Vector3 m_BackWheelPosition = new Vector3(0.8f, -0.5f, -1.0f);
     // ---------------------------
-    List<GameObject> m_Wheels;
+    public List<GameObject> m_Wheels;
 
 
 
@@ -50,8 +50,6 @@ public class CarBehaviour : MonoBehaviour
     private void Awake()
     {
         m_CarRigidbody = GetComponent<Rigidbody>();
-
-        m_Wheels = new List<GameObject>();
     }
 
     private void Start()
@@ -117,33 +115,44 @@ public class CarBehaviour : MonoBehaviour
         m_BodyMeshFilter.mesh       = m_BodyMesh;
         m_BodyRenderer.material     = m_BodyMaterial;
 
+
+
         int l_FrontWheelsAmount = m_FrontWheelsAmount;
         int l_BackWheelsAmount = m_BackWheelsAmount;
         Vector3 l_FrontWheelPos = m_FrontWheelPosition;
         Vector3 l_BackWheelPos = m_BackWheelPosition;
-        // BORRAR TODAS LAS RUEDAS DE m_Wheels          AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        // CREAR FUNCION ERASE WHEELS
 
-        m_Wheels.Clear();
+        foreach (GameObject i_Wheel in m_Wheels)
+        {
+            if (i_Wheel.name.Contains("WheelF"))
+            {
+                if (l_FrontWheelsAmount > 0)
+                {
+                    if(!i_Wheel.activeInHierarchy) i_Wheel.SetActive(true);
+                    i_Wheel.transform.localPosition = l_FrontWheelPos;
+                    l_FrontWheelPos.x *= -1;
+                    l_FrontWheelsAmount--;
+                }
+                else
+                {
+                    i_Wheel.SetActive(false);
+                }
+            }
 
-        // CREAR FUNCION SPAWN WHEELS
-        while (l_FrontWheelsAmount > 0)
-        {
-            GameObject l_Wheel = Instantiate(m_WheelPrefab);
-            l_Wheel.transform.parent = transform;
-            l_Wheel.transform.localPosition = l_FrontWheelPos;
-            m_Wheels.Add(l_Wheel);
-            l_FrontWheelPos.x *= -1;
-            l_FrontWheelsAmount -= 1;
-        }
-        while (l_BackWheelsAmount > 0)
-        {
-            GameObject l_Wheel = Instantiate(m_WheelPrefab);
-            l_Wheel.transform.parent = transform;
-            l_Wheel.transform.localPosition = l_BackWheelPos;
-            m_Wheels.Add(l_Wheel);
-            l_BackWheelPos.x *= -1;
-            l_BackWheelsAmount -= 1;
+            if (i_Wheel.name.Contains("WheelB"))
+            {
+                if (l_BackWheelsAmount > 0)
+                {
+                    if (!i_Wheel.activeInHierarchy) i_Wheel.SetActive(true);
+                    i_Wheel.transform.localPosition = l_BackWheelPos;
+                    l_BackWheelPos.x *= -1;
+                    l_BackWheelsAmount--;
+                }
+                else
+                {
+                    i_Wheel.SetActive(false);
+                }
+            }
         }
     }
     void GetWheelParams(GameObject i_Wheel)
