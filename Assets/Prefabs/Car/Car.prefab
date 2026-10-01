@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7871970466851944215}
-  - component: {fileID: 3227856117270118054}
   - component: {fileID: 8974192594148247508}
-  - component: {fileID: 661973309741466490}
+  - component: {fileID: 4726413784744265745}
   m_Layer: 0
   m_Name: Car
   m_TagString: Untagged
@@ -39,27 +38,6 @@ Transform:
   - {fileID: 4512635694638481486}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &3227856117270118054
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2298385936904929679}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 1, z: 3}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &8974192594148247508
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -87,7 +65,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &661973309741466490
+--- !u!114 &4726413784744265745
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -96,18 +74,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2298385936904929679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f25dd72cf8660344b4a8cb94f4cc58f, type: 3}
+  m_Script: {fileID: 11500000, guid: bf4960e1793417a4cabc891c9386f8cf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CarBehaviour
+  m_EditorClassIdentifier: Assembly-CSharp::CarBehaviour_V2
   m_CollisionMask:
     serializedVersion: 2
     m_Bits: 64
+  m_Body: {fileID: 6929105299012079672}
   m_Wheels:
   - {fileID: 3081006533883227292}
   - {fileID: 8048663150390171654}
   - {fileID: 296049470565097140}
   - {fileID: 5277273960091658422}
-  m_Body: {fileID: 6929105299012079672}
 --- !u!1 &6929105299012079672
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,6 +98,7 @@ GameObject:
   - component: {fileID: 5880920429042648675}
   - component: {fileID: 3422422549748569364}
   - component: {fileID: 2731008436196796597}
+  - component: {fileID: 8974676050098032707}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -212,6 +191,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BodyBehaviour
   m_BodyParams: {fileID: 11400000, guid: 93fae6f10f8826e408462506edd990da, type: 2}
+--- !u!65 &8974676050098032707
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6929105299012079672}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &214937705900165889
 PrefabInstance:
   m_ObjectHideFlags: 0
