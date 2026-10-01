@@ -6,6 +6,7 @@ public class BodyParams : ScriptableObject
 {
     [Header("Physics variables")]
     [Tooltip("Mass in kilograms")] public float m_BodyWeight = 1.0f;
+    [Tooltip("direction change speed")] public float m_WheelTurnPower = 5.0f;
 
     [Header("Model variables")]
     public Mesh m_BodyMesh;

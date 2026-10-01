@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: TestBody2
   m_EditorClassIdentifier: Assembly-CSharp::BodyParams
   m_BodyWeight: 1
+  m_WheelTurnPower: 1
   m_BodyMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   m_BodyMaterial: {fileID: 2100000, guid: 76fcac89166d8aa488166ab3e75f3873, type: 2}
   m_FrontWheelsAmount: 1
-  m_BackWheelsAmount: 2
+  m_BackWheelsAmount: 1
   m_FrontWheelPosition: {x: 0, y: -0.5, z: 1}
   m_BackWheelPosition: {x: 0.8, y: -0.5, z: -1}

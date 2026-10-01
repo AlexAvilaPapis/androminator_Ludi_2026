@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CarBehaviour_V2 : MonoBehaviour
 {
     [SerializeField] LayerMask m_CollisionMask;
     [SerializeField] GameObject m_Body = null;
-    //[SerializeField] GameObject m_WheelPrefab = null;
+
+    [SerializeField] InputActionAsset m_InputActionAsset;
+    InputAction m_TurnAction;
+    //InputAction m_AccelerateAction;
 
     Rigidbody m_CarRigidbody;
     float m_TotalWeight;
@@ -19,6 +23,7 @@ public class CarBehaviour_V2 : MonoBehaviour
     Renderer m_BodyRenderer;
 
     float m_BodyWeight = 1.0f;
+    float m_WheelTurnPower = 5.0f;
     Mesh m_BodyMesh;
     Material m_BodyMaterial;
     int m_FrontWheelsAmount = 2;
@@ -55,6 +60,8 @@ public class CarBehaviour_V2 : MonoBehaviour
     private void Awake()
     {
         m_CarRigidbody = GetComponent<Rigidbody>();
+
+        m_TurnAction = InputSystem.actions.FindAction("Move");
     }
 
     private void Start()
@@ -68,6 +75,44 @@ public class CarBehaviour_V2 : MonoBehaviour
         for (int i = 0; i < m_ActiveWheels.Count; i++)
         {
             ApplyForces(i);
+        }
+
+        ApplyMovementInput();
+    }
+
+
+    float m_MaxWheelAngle = 45.0f;
+    float m_CurrentWheelAngle = 0.0f;
+    void ApplyMovementInput()
+    {
+        float l_InputValue = m_TurnAction.ReadValue<Vector2>().x;
+
+        if (m_TurnAction.IsPressed())
+        {
+            m_CurrentWheelAngle += m_MaxWheelAngle * l_InputValue * m_WheelTurnPower * Time.deltaTime;
+        }
+        else if (m_CurrentWheelAngle > 0.1f || m_CurrentWheelAngle < -0.1f)
+        {
+            m_CurrentWheelAngle += m_MaxWheelAngle * -Mathf.Sign(m_CurrentWheelAngle) * m_WheelTurnPower * Time.deltaTime;
+        }
+        else
+        {
+            m_CurrentWheelAngle = 0;
+        }
+
+        m_CurrentWheelAngle = Mathf.Clamp(m_CurrentWheelAngle, -m_MaxWheelAngle, m_MaxWheelAngle);
+
+
+
+        foreach (GameObject i_Wheel in m_ActiveWheels)
+        {
+            if (i_Wheel.name.Contains("WheelF"))
+            {
+                Vector3 l_CurrentRotation = i_Wheel.transform.localRotation.eulerAngles;
+                l_CurrentRotation.y = m_CurrentWheelAngle;
+
+                i_Wheel.transform.localRotation = Quaternion.Euler(l_CurrentRotation);
+            }
         }
     }
 
@@ -125,6 +170,7 @@ public class CarBehaviour_V2 : MonoBehaviour
         m_BodyRenderer      = m_Body.GetComponent<Renderer>();
 
         m_BodyWeight            = m_BodyBehaviour.m_BodyParams.m_BodyWeight;
+        m_WheelTurnPower        = m_BodyBehaviour.m_BodyParams.m_WheelTurnPower;
         m_BodyMesh              = m_BodyBehaviour.m_BodyParams.m_BodyMesh;
         m_BodyMaterial          = m_BodyBehaviour.m_BodyParams.m_BodyMaterial;
         m_FrontWheelsAmount     = m_BodyBehaviour.m_BodyParams.m_FrontWheelsAmount;
@@ -132,7 +178,6 @@ public class CarBehaviour_V2 : MonoBehaviour
         m_FrontWheelPosition    = m_BodyBehaviour.m_BodyParams.m_FrontWheelPosition;
         m_BackWheelPosition     = m_BodyBehaviour.m_BodyParams.m_BackWheelPosition;
 
-        m_CarRigidbody.mass         = m_BodyWeight;
         m_BodyMeshFilter.mesh       = m_BodyMesh;
         m_BodyRenderer.material     = m_BodyMaterial;
 
@@ -142,7 +187,8 @@ public class CarBehaviour_V2 : MonoBehaviour
         int l_BackWheelsAmount = m_BackWheelsAmount;
         Vector3 l_FrontWheelPos = m_FrontWheelPosition;
         Vector3 l_BackWheelPos = m_BackWheelPosition;
-
+        m_ActiveWheels.Clear();
+        
         foreach (GameObject i_Wheel in m_Wheels)
         {
             if (i_Wheel.name.Contains("WheelF"))
@@ -175,25 +221,35 @@ public class CarBehaviour_V2 : MonoBehaviour
                 }
             }
 
-            if (i_Wheel.activeInHierarchy) m_ActiveWheels.Add(i_Wheel);
+            if (i_Wheel.activeInHierarchy) 
+            {
+                m_ActiveWheels.Add(i_Wheel);
+            }
         }
 
-        SetNewWheelArrays(m_ActiveWheels.Count);
+        SetNewWheelsParams(m_ActiveWheels.Count);
 
         GetWheelParams();
+
+
+
+        CalculateCarWeight();
     }
+
+
+
     void GetWheelParams()
     {
         for (int i = 0; i < m_ActiveWheels.Count; i++)
         {
-            GameObject l_Wheel = m_ActiveWheels[i];
+            GameObject l_Wheel          = m_ActiveWheels[i];
             m_WheelBehaviour[i]         = l_Wheel.GetComponent<WheelBehaviour>();
             m_WheelTransform[i]         = l_Wheel.transform;
             m_WheelMeshFilter[i]        = l_Wheel.GetComponentInChildren<MeshFilter>();
             m_WheelRenderer[i]          = l_Wheel.GetComponentInChildren<Renderer>();
             m_WheelMeshTransform[i]     = m_WheelRenderer[i].transform;
 
-            WheelParams l_WheelParams = m_WheelBehaviour[i].m_WheelParams;
+            WheelParams l_WheelParams   = m_WheelBehaviour[i].m_WheelParams;
             m_SpringFullDistance[i]     = l_WheelParams.m_SpringFullDistance;
             m_SpringRestDistance[i]     = l_WheelParams.m_SpringRestDistance;
             m_SpringForce[i]            = l_WheelParams.m_SpringForce;
@@ -206,26 +262,54 @@ public class CarBehaviour_V2 : MonoBehaviour
             m_WheelMeshFilter[i].mesh       = m_WheelMesh[i];
             m_WheelRenderer[i].material     = m_WheelMaterial[i];
         }
+
+
+
+        CalculateCarWeight();
     }
 
-    void SetNewWheelArrays(int i)
+    void SetNewWheelsParams(int i)
     {
-        m_WheelBehaviour = new WheelBehaviour[i];
-        m_WheelTransform = new Transform[i];
-        m_WheelMeshTransform = new Transform[i];
-        m_WheelMeshFilter = new MeshFilter[i];
-        m_WheelRenderer = new Renderer[i];
+        m_WheelBehaviour        = new WheelBehaviour[i];
+        m_WheelTransform        = new Transform[i];
+        m_WheelMeshTransform    = new Transform[i];
+        m_WheelMeshFilter       = new MeshFilter[i];
+        m_WheelRenderer         = new Renderer[i];
 
-        m_SpringFullDistance = new float[i];
-        m_SpringRestDistance = new float[i];
-        m_SpringForce = new float[i];
-        m_SpringDamper = new float[i];
-        m_WheelMesh = new Mesh[i];
-        m_WheelMaterial = new Material[i];
+        m_SpringFullDistance    = new float[i];
+        m_SpringRestDistance    = new float[i];
+        m_SpringForce           = new float[i];
+        m_SpringDamper          = new float[i];
+        m_WheelMesh             = new Mesh[i];
+        m_WheelMaterial         = new Material[i];
 
-        m_WheelGripFactor = new float[i];
-        m_WheelWeight = new float[i];
+        m_WheelGripFactor   = new float[i];
+        m_WheelWeight       = new float[i];
 
-        m_WheelRayHit = new RaycastHit[i];
+        m_WheelRayHit       = new RaycastHit[i];
+    }
+
+
+
+    void CalculateCarWeight()
+    {
+        float l_TotalWheelsWeight = 0.0f;
+        for (int i = 0; i < m_ActiveWheels.Count; ++i)
+        {
+            l_TotalWheelsWeight += m_WheelWeight[i];
+        }
+        m_TotalWeight = m_BodyWeight + l_TotalWheelsWeight;
+        m_CarRigidbody.mass = m_TotalWeight;
+    }
+
+
+
+    private void OnEnable()
+    {
+        m_InputActionAsset.FindActionMap("Player").Enable();
+    }
+    private void OnDisable()
+    {
+        m_InputActionAsset.FindActionMap("Player").Disable();
     }
 }
