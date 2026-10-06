@@ -165,21 +165,21 @@ public class CarBehaviour : MonoBehaviour
 
     void GetBodyParams()
     {
-        m_BodyBehaviour = m_Body.GetComponent<BodyBehaviour>();
-        m_BodyMeshFilter = m_Body.GetComponent<MeshFilter>();
-        m_BodyRenderer = m_Body.GetComponent<Renderer>();
+        m_BodyBehaviour     = m_Body.GetComponent<BodyBehaviour>();
+        m_BodyMeshFilter    = m_Body.GetComponent<MeshFilter>();
+        m_BodyRenderer      = m_Body.GetComponent<Renderer>();
 
-        m_BodyWeight = m_BodyBehaviour.m_BodyParams.m_BodyWeight;
-        m_WheelTurnPower = m_BodyBehaviour.m_BodyParams.m_WheelTurnPower;
-        m_BodyMesh = m_BodyBehaviour.m_BodyParams.m_BodyMesh;
-        m_BodyMaterial = m_BodyBehaviour.m_BodyParams.m_BodyMaterial;
-        m_FrontWheelsAmount = m_BodyBehaviour.m_BodyParams.m_FrontWheelsAmount;
-        m_BackWheelsAmount = m_BodyBehaviour.m_BodyParams.m_BackWheelsAmount;
-        m_FrontWheelPosition = m_BodyBehaviour.m_BodyParams.m_FrontWheelPosition;
-        m_BackWheelPosition = m_BodyBehaviour.m_BodyParams.m_BackWheelPosition;
+        m_BodyWeight            = m_BodyBehaviour.m_BodyParams.m_BodyWeight;
+        m_WheelTurnPower        = m_BodyBehaviour.m_BodyParams.m_WheelTurnPower;
+        m_BodyMesh              = m_BodyBehaviour.m_BodyParams.m_BodyMesh;
+        m_BodyMaterial          = m_BodyBehaviour.m_BodyParams.m_BodyMaterial;
+        m_FrontWheelsAmount     = m_BodyBehaviour.m_BodyParams.m_FrontWheelsAmount;
+        m_BackWheelsAmount      = m_BodyBehaviour.m_BodyParams.m_BackWheelsAmount;
+        m_FrontWheelPosition    = m_BodyBehaviour.m_BodyParams.m_FrontWheelPosition;
+        m_BackWheelPosition     = m_BodyBehaviour.m_BodyParams.m_BackWheelPosition;
 
-        m_BodyMeshFilter.mesh = m_BodyMesh;
-        m_BodyRenderer.material = m_BodyMaterial;
+        m_BodyMeshFilter.mesh       = m_BodyMesh;
+        m_BodyRenderer.material     = m_BodyMaterial;
 
 
 
@@ -188,7 +188,7 @@ public class CarBehaviour : MonoBehaviour
         Vector3 l_FrontWheelPos = m_FrontWheelPosition;
         Vector3 l_BackWheelPos = m_BackWheelPosition;
         m_ActiveWheels.Clear();
-
+        
         foreach (GameObject i_Wheel in m_Wheels)
         {
             if (i_Wheel.name.Contains("WheelF"))
@@ -221,7 +221,7 @@ public class CarBehaviour : MonoBehaviour
                 }
             }
 
-            if (i_Wheel.activeInHierarchy)
+            if (i_Wheel.activeInHierarchy) 
             {
                 m_ActiveWheels.Add(i_Wheel);
             }
@@ -242,25 +242,25 @@ public class CarBehaviour : MonoBehaviour
     {
         for (int i = 0; i < m_ActiveWheels.Count; i++)
         {
-            GameObject l_Wheel = m_ActiveWheels[i];
-            m_WheelBehaviour[i] = l_Wheel.GetComponent<WheelBehaviour>();
-            m_WheelTransform[i] = l_Wheel.transform;
-            m_WheelMeshFilter[i] = l_Wheel.GetComponentInChildren<MeshFilter>();
-            m_WheelRenderer[i] = l_Wheel.GetComponentInChildren<Renderer>();
-            m_WheelMeshTransform[i] = m_WheelRenderer[i].transform;
+            GameObject l_Wheel          = m_ActiveWheels[i];
+            m_WheelBehaviour[i]         = l_Wheel.GetComponent<WheelBehaviour>();
+            m_WheelTransform[i]         = l_Wheel.transform;
+            m_WheelMeshFilter[i]        = l_Wheel.GetComponentInChildren<MeshFilter>();
+            m_WheelRenderer[i]          = l_Wheel.GetComponentInChildren<Renderer>();
+            m_WheelMeshTransform[i]     = m_WheelRenderer[i].transform;
 
-            WheelParams l_WheelParams = m_WheelBehaviour[i].m_WheelParams;
-            m_SpringFullDistance[i] = l_WheelParams.m_SpringFullDistance;
-            m_SpringRestDistance[i] = l_WheelParams.m_SpringRestDistance;
-            m_SpringForce[i] = l_WheelParams.m_SpringForce;
-            m_SpringDamper[i] = l_WheelParams.m_SpringDamper;
-            m_WheelMesh[i] = l_WheelParams.m_WheelMesh;
-            m_WheelMaterial[i] = l_WheelParams.m_WheelMaterial;
-            m_WheelGripFactor[i] = l_WheelParams.m_WheelGripFactor;
-            m_WheelWeight[i] = l_WheelParams.m_WheelWeight;
+            WheelParams l_WheelParams   = m_WheelBehaviour[i].m_WheelParams;
+            m_SpringFullDistance[i]     = l_WheelParams.m_SpringFullDistance;
+            m_SpringRestDistance[i]     = l_WheelParams.m_SpringRestDistance;
+            m_SpringForce[i]            = l_WheelParams.m_SpringForce;
+            m_SpringDamper[i]           = l_WheelParams.m_SpringDamper;
+            m_WheelMesh[i]              = l_WheelParams.m_WheelMesh;
+            m_WheelMaterial[i]          = l_WheelParams.m_WheelMaterial;
+            m_WheelGripFactor[i]        = l_WheelParams.m_WheelGripFactor;
+            m_WheelWeight[i]            = l_WheelParams.m_WheelWeight;
 
-            m_WheelMeshFilter[i].mesh = m_WheelMesh[i];
-            m_WheelRenderer[i].material = m_WheelMaterial[i];
+            m_WheelMeshFilter[i].mesh       = m_WheelMesh[i];
+            m_WheelRenderer[i].material     = m_WheelMaterial[i];
         }
 
 
@@ -270,23 +270,23 @@ public class CarBehaviour : MonoBehaviour
 
     void SetNewWheelsParams(int i)
     {
-        m_WheelBehaviour = new WheelBehaviour[i];
-        m_WheelTransform = new Transform[i];
-        m_WheelMeshTransform = new Transform[i];
-        m_WheelMeshFilter = new MeshFilter[i];
-        m_WheelRenderer = new Renderer[i];
+        m_WheelBehaviour        = new WheelBehaviour[i];
+        m_WheelTransform        = new Transform[i];
+        m_WheelMeshTransform    = new Transform[i];
+        m_WheelMeshFilter       = new MeshFilter[i];
+        m_WheelRenderer         = new Renderer[i];
 
-        m_SpringFullDistance = new float[i];
-        m_SpringRestDistance = new float[i];
-        m_SpringForce = new float[i];
-        m_SpringDamper = new float[i];
-        m_WheelMesh = new Mesh[i];
-        m_WheelMaterial = new Material[i];
+        m_SpringFullDistance    = new float[i];
+        m_SpringRestDistance    = new float[i];
+        m_SpringForce           = new float[i];
+        m_SpringDamper          = new float[i];
+        m_WheelMesh             = new Mesh[i];
+        m_WheelMaterial         = new Material[i];
 
-        m_WheelGripFactor = new float[i];
-        m_WheelWeight = new float[i];
+        m_WheelGripFactor   = new float[i];
+        m_WheelWeight       = new float[i];
 
-        m_WheelRayHit = new RaycastHit[i];
+        m_WheelRayHit       = new RaycastHit[i];
     }
 
 
@@ -307,23 +307,9 @@ public class CarBehaviour : MonoBehaviour
     private void OnEnable()
     {
         m_InputActionAsset.FindActionMap("Player").Enable();
-
-        foreach (GameObject i_Wheel in m_ActiveWheels)
-        {
-
-        }
     }
     private void OnDisable()
     {
         m_InputActionAsset.FindActionMap("Player").Disable();
-    }
-
-    public void FLCollisionStay(Collision collision)
-    {
-        Debug.Log("hola");
-    }
-    public void FLCollisionExit(Collision collision)
-    {
-        Debug.Log("hola");
     }
 }
