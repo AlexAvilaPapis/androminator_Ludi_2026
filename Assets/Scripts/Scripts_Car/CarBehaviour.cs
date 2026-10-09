@@ -81,15 +81,15 @@ public class CarBehaviour : MonoBehaviour
     }
 
 
-    float m_MaxWheelAngle = 15.0f;
-    float m_CurrentWheelAngle = 0.0f;
-    float m_MaxCarSpeed = 20.0f;
-    float m_CurrentWheelSpeed = 0.0f;
-    float m_SpeedTimeToMax = 1.0f;
 
     float m_HorizontalInput = 0.0f;
     float m_VerticalInput = 0.0f;
-    float m_CurrentVerticalInput = 0.0f;
+
+    float m_MaxWheelAngle = 15.0f;
+    float m_MaxCarSpeed = 30.0f;
+
+    float m_CurrentWheelAngle = 0.0f;
+    float m_CurrentCarSpeed = 0.0f;
     void ApplyMovementInput()
     {
         // STEERING -------------------------
@@ -128,27 +128,7 @@ public class CarBehaviour : MonoBehaviour
 
 
         // VELOCITY -------------------------
-        //float l_CarSpeed = Vector3.Dot(transform.forward, m_CarRigidbody.linearVelocity);
-
-
-        //if (m_TurnAction.IsPressed() && m_VerticalInput != 0)
-        //{
-        //    m_CurrentVerticalInput += m_VerticalInput * m_SpeedTimeToMax * Time.deltaTime;
-        //}
-        //else if (l_CarSpeed > 0.1f || l_CarSpeed < -0.1f)
-        //{
-        //    m_CurrentVerticalInput += -Mathf.Sign(m_CurrentVerticalInput) * m_SpeedTimeToMax * Time.deltaTime;
-        //}
-        //else
-        //{
-        //    m_CurrentVerticalInput = 0;
-        //}
-
-        //m_CurrentVerticalInput = Mathf.Clamp(m_CurrentVerticalInput, -1, 1);
-
-
-
-        m_CurrentVerticalInput = m_VerticalInput;
+        m_CurrentCarSpeed = m_VerticalInput * m_MaxCarSpeed;
         // ----------------------------------
     }
 
@@ -167,9 +147,14 @@ public class CarBehaviour : MonoBehaviour
 
             float l_Offset = m_SpringRestDistance[i] - m_WheelRayHit[i].distance;
 
-            float l_Velocity = Vector3.Dot(l_SpringDirection, l_WheelWorldVelocity);
+            float l_VerticalVelocity = Vector3.Dot(l_SpringDirection, l_WheelWorldVelocity);
 
-            float l_SuspensionForce = (l_Offset * m_SpringForce[i]) - (l_Velocity * m_SpringDamper[i]);
+            float l_ElasticityForce = (l_Offset * m_SpringForce[i]);
+            float l_DampingForce = (l_VerticalVelocity * m_SpringDamper[i]);
+            float l_MaxElasticityForce = (m_SpringFullDistance[i] - m_SpringRestDistance[i]) * m_SpringForce[i];    // PRESCINDIBLE
+            l_DampingForce = Mathf.Clamp(l_DampingForce, -l_MaxElasticityForce, l_MaxElasticityForce);              // PRESCINDIBLE
+
+            float l_SuspensionForce = l_ElasticityForce - l_DampingForce;
 
             m_CarRigidbody.AddForceAtPosition(l_SpringDirection * l_SuspensionForce, m_WheelRayHit[i].point);
 
@@ -181,14 +166,14 @@ public class CarBehaviour : MonoBehaviour
             // STEERING --------------------------------------------------
             Vector3 l_SteeringDirection = Vector3.ProjectOnPlane(m_WheelTransform[i].right, m_WheelRayHit[i].normal);
 
-            float l_SteeringVelocity = Vector3.Dot(l_WheelWorldVelocity, l_SteeringDirection);
+            float l_SteeringVelocity = Vector3.Dot(l_SteeringDirection, l_WheelWorldVelocity);
 
             float l_DesiredVelocityChange = -l_SteeringVelocity * m_WheelGripFactor[i];
 
-            //float l_DesiredAcceleration = l_DesiredVelocityChange * (1 / Time.fixedDeltaTime);
+            float l_DesiredAcceleration = l_DesiredVelocityChange / 1;
 
             m_CarRigidbody.AddForceAtPosition(
-                m_WheelTransform[i].right * (m_BodyWeight / (m_FrontWheelsAmount + m_BackWheelsAmount)) * l_DesiredVelocityChange,
+                l_SteeringDirection * m_WheelWeight[i] * l_DesiredAcceleration,
                 m_WheelTransform[i].position);
             // -----------------------------------------------------------
 
@@ -204,11 +189,11 @@ public class CarBehaviour : MonoBehaviour
                 float l_CarSpeedNormalized = Mathf.Clamp01(Mathf.Abs(l_CarSpeed) / m_MaxCarSpeed);
 
                 float l_Acceleration = 0.0f;
-                if (m_CurrentVerticalInput != 0)
+                if (m_CurrentCarSpeed != 0)
                 {
-                    l_Acceleration = m_SpeedCurve.Evaluate(l_CarSpeedNormalized) * m_CurrentVerticalInput * m_MaxCarSpeed;
+                    l_Acceleration = m_SpeedCurve.Evaluate(l_CarSpeedNormalized) * m_CurrentCarSpeed;
                 }
-                else if(l_CarSpeed > 0.1f || l_CarSpeed < -0.1f)
+                else
                 {
                     l_Acceleration = -Mathf.Sign(l_CarSpeed) * 1 / 10 * m_MaxCarSpeed;
                 }
@@ -217,14 +202,23 @@ public class CarBehaviour : MonoBehaviour
 
 
 
-                l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
-                Debug.Log(l_CarSpeed);
+                //l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
+                //Debug.Log(l_CarSpeed);
             }
             // -----------------------------------------------------------
         }
         else
         {
-            //m_WheelMeshTransform[i].position = Vector3.Lerp(m_WheelMeshTransform[i].position, m_WheelTransform[i].position + (-m_WheelTransform[i].up * (m_SpringRestDistance[i])), Time.deltaTime);
+            // WHEELS GRAVITY --------------------------------------------
+            Vector3 l_WheelWorldVelocity = m_CarRigidbody.GetPointVelocity(m_WheelTransform[i].position);
+
+            Vector3 l_VerticalSpeed = Vector3.up * -Physics.gravity.y * Time.deltaTime;
+
+            float l_SpringSpeed = Vector3.Dot(m_WheelTransform[i].up, l_VerticalSpeed);
+
+            m_WheelMeshTransform[i].position -= m_WheelTransform[i].up * l_SpringSpeed / m_SpringDamper[i];
+            m_WheelMeshTransform[i].localPosition = Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
+            // -----------------------------------------------------------
         }
     }
 

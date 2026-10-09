@@ -10,7 +10,7 @@ public class WheelParams : ScriptableObject
     [Tooltip("Elasticity of spring")]   public float m_SpringDamper = 0.5f;
 
     [Header("Steering variables")]
-    [Tooltip("Drift resist force")]     public float m_WheelGripFactor = 0.5f;
+    [Tooltip("Drift resist force")]     [Range(0,1.0f)] public float m_WheelGripFactor = 0.5f;
     [Tooltip("Mass in kilograms")]      public float m_WheelWeight = 1.0f;
 
     [Header("Model variables")]
