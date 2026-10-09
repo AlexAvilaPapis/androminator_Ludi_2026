@@ -15,7 +15,7 @@ MonoBehaviour:
   m_SpringFullDistance: 1
   m_SpringRestDistance: 0.5
   m_SpringForce: 50
-  m_SpringDamper: 5
+  m_SpringDamper: 3
   m_WheelGripFactor: 0.7
   m_WheelWeight: 1
   m_WheelMesh: {fileID: -951608786083511892, guid: c1bb62bffa7236f448f5a9a3e1e0f949, type: 3}

@@ -9,11 +9,22 @@ public class CarBehaviour : MonoBehaviour
     [SerializeField] GameObject m_Body = null;
 
     [SerializeField] InputActionAsset m_InputActionAsset;
-    InputAction m_TurnAction;
-    //InputAction m_AccelerateAction;
+    InputAction m_MoveAction;
 
-    Rigidbody m_CarRigidbody;
+    // GENERAL DATA -----------------
+    [SerializeField] float m_MaxWheelAngle = 15.0f;
+    [SerializeField] float m_MaxCarSpeed = 30.0f;
+
+    [SerializeField] AnimationCurve m_SpeedCurve;
+
+    float m_HorizontalInput = 0.0f;
+    float m_VerticalInput = 0.0f;
+
+    float m_CurrentWheelAngle = 0.0f;
+    float m_CurrentCarSpeed = 0.0f;
+
     float m_TotalWeight;
+    // ------------------------------
 
 
 
@@ -55,13 +66,15 @@ public class CarBehaviour : MonoBehaviour
     // ---------------------------------
     RaycastHit[] m_WheelRayHit;
 
+    Rigidbody m_CarRigidbody;
+
 
 
     private void Awake()
     {
         m_CarRigidbody = GetComponentInChildren<Rigidbody>();
 
-        m_TurnAction = InputSystem.actions.FindAction("Move");
+        m_MoveAction = InputSystem.actions.FindAction("Move");
     }
 
     private void Start()
@@ -81,22 +94,14 @@ public class CarBehaviour : MonoBehaviour
     }
 
 
-
-    float m_HorizontalInput = 0.0f;
-    float m_VerticalInput = 0.0f;
-
-    float m_MaxWheelAngle = 15.0f;
-    float m_MaxCarSpeed = 30.0f;
-
-    float m_CurrentWheelAngle = 0.0f;
-    float m_CurrentCarSpeed = 0.0f;
+    
     void ApplyMovementInput()
     {
         // STEERING -------------------------
-        m_HorizontalInput = m_TurnAction.ReadValue<Vector2>().x;
-        m_VerticalInput = m_TurnAction.ReadValue<Vector2>().y;
+        m_HorizontalInput = m_MoveAction.ReadValue<Vector2>().x;
+        m_VerticalInput = m_MoveAction.ReadValue<Vector2>().y;
 
-        if (m_TurnAction.IsPressed() && m_HorizontalInput != 0)
+        if (m_MoveAction.IsPressed() && m_HorizontalInput != 0)
         {
             m_CurrentWheelAngle += m_MaxWheelAngle * m_HorizontalInput * m_WheelTurnPower * Time.deltaTime;
         }
@@ -133,7 +138,7 @@ public class CarBehaviour : MonoBehaviour
     }
 
 
-    public AnimationCurve m_SpeedCurve;
+    
 
     void ApplyForces(int i)
     {
@@ -182,7 +187,8 @@ public class CarBehaviour : MonoBehaviour
             // ACCELERATION ----------------------------------------------
             if (m_ActiveWheels[i].name.Contains("WheelF"))
             {
-                Vector3 l_AccelerationDirection = Vector3.ProjectOnPlane(m_WheelTransform[i].forward, m_WheelRayHit[i].normal);
+                //Vector3 l_AccelerationDirection = Vector3.ProjectOnPlane(m_WheelTransform[i].forward, m_WheelRayHit[i].normal);
+                Vector3 l_AccelerationDirection = m_WheelTransform[i].forward;
 
                 float l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
 
