@@ -10,6 +10,7 @@ public class CarBehaviour : MonoBehaviour
 
     [SerializeField] InputActionAsset m_InputActionAsset;
     InputAction m_MoveAction;
+    InputAction m_JumpAction;
 
     // GENERAL DATA -----------------
     [SerializeField] float m_MaxWheelAngle = 15.0f;
@@ -29,6 +30,8 @@ public class CarBehaviour : MonoBehaviour
 
 
     // BODY DATA -----------------
+    [SerializeField] float m_JumpForce = 50.0f;
+
     BodyBehaviour m_BodyBehaviour;
     MeshFilter m_BodyMeshFilter;
     Renderer m_BodyRenderer;
@@ -75,6 +78,7 @@ public class CarBehaviour : MonoBehaviour
         m_CarRigidbody = GetComponentInChildren<Rigidbody>();
 
         m_MoveAction = InputSystem.actions.FindAction("Move");
+        m_JumpAction = InputSystem.actions.FindAction("Jump");
     }
 
     private void Start()
@@ -94,7 +98,7 @@ public class CarBehaviour : MonoBehaviour
     }
 
 
-    
+
     void ApplyMovementInput()
     {
         // STEERING -------------------------
@@ -138,7 +142,7 @@ public class CarBehaviour : MonoBehaviour
     }
 
 
-    
+
 
     void ApplyForces(int i)
     {
@@ -210,6 +214,17 @@ public class CarBehaviour : MonoBehaviour
 
                 //l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
                 //Debug.Log(l_CarSpeed);
+            }
+            // -----------------------------------------------------------
+
+
+            
+            // JUMP ------------------------------------------------------
+            if (m_JumpAction.IsPressed())
+            {
+                Vector3 l_JumpDirection = m_WheelTransform[i].up;
+
+                m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_JumpForce, m_WheelTransform[i].position);
             }
             // -----------------------------------------------------------
         }
