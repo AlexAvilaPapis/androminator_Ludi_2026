@@ -231,6 +231,17 @@ public class CarBehaviour : MonoBehaviour
                 //m_CarRigidbody.angularVelocity = Vector3.zero;
             }
             // -----------------------------------------------------------
+
+
+
+            // Weight to swing -------------------------------------------
+            if (m_WheelRayHit[i].transform.name == "Columpio")
+            {
+                Rigidbody l_SwingRigidbody = m_WheelRayHit[i].transform.GetComponent<Rigidbody>();
+
+                l_SwingRigidbody.AddForceAtPosition(-m_WheelTransform[i].up * m_CarRigidbody.mass * -Physics.gravity.y * Time.deltaTime, m_WheelRayHit[i].point);
+            }
+            // -----------------------------------------------------------
         }
         else
         {
