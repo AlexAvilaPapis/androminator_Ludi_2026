@@ -83,11 +83,8 @@ MonoBehaviour:
     m_Bits: 64
   m_Body: {fileID: 6929105299012079672}
   m_InputActionAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_Wheels:
-  - {fileID: 3081006533883227292}
-  - {fileID: 8048663150390171654}
-  - {fileID: 296049470565097140}
-  - {fileID: 5277273960091658422}
+  m_MaxWheelAngle: 15
+  m_MaxCarSpeed: 30
   m_SpeedCurve:
     serializedVersion: 2
     m_Curve:
@@ -130,6 +127,13 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  m_JumpAcceleration: 10
+  m_JumpFlipForce: 60
+  m_Wheels:
+  - {fileID: 3081006533883227292}
+  - {fileID: 8048663150390171654}
+  - {fileID: 296049470565097140}
+  - {fileID: 5277273960091658422}
 --- !u!1 &6220004269182864592
 GameObject:
   m_ObjectHideFlags: 0

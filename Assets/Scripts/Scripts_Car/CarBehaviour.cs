@@ -30,7 +30,8 @@ public class CarBehaviour : MonoBehaviour
 
 
     // BODY DATA -----------------
-    [SerializeField] float m_JumpForce = 50.0f;
+    [SerializeField] float m_JumpAcceleration = 10.0f;
+    [SerializeField] float m_JumpFlipForce = 60.0f;
 
     BodyBehaviour m_BodyBehaviour;
     MeshFilter m_BodyMeshFilter;
@@ -89,12 +90,15 @@ public class CarBehaviour : MonoBehaviour
 
     private void Update()
     {
+        Update_Jump();
+
         for (int i = 0; i < m_ActiveWheels.Count; i++)
         {
             ApplyForces(i);
         }
 
         ApplyMovementInput();
+
     }
 
 
@@ -146,7 +150,9 @@ public class CarBehaviour : MonoBehaviour
 
     void ApplyForces(int i)
     {
-        if (Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, out m_WheelRayHit[i], m_SpringFullDistance[i], m_CollisionMask))
+        bool l_IsWheelGrounded = Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, out m_WheelRayHit[i], m_SpringFullDistance[i], m_CollisionMask);
+
+        if (l_IsWheelGrounded)
         {
             // SUSPENSION ------------------------------------------------
             //Vector3 l_SpringDirection = m_WheelRayHit[i].normal;
@@ -209,22 +215,19 @@ public class CarBehaviour : MonoBehaviour
                 }
 
                 m_CarRigidbody.AddForceAtPosition(l_AccelerationDirection * l_Acceleration / m_FrontWheelsAmount, m_WheelTransform[i].position);
-
-
-
-                //l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
-                //Debug.Log(l_CarSpeed);
             }
             // -----------------------------------------------------------
 
 
-            
+
             // JUMP ------------------------------------------------------
             if (m_JumpAction.IsPressed())
+            //if (m_JumpTrigger)
             {
                 Vector3 l_JumpDirection = m_WheelTransform[i].up;
 
-                m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_JumpForce, m_WheelTransform[i].position);
+                m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_TotalWeight * m_JumpAcceleration, m_WheelTransform[i].position);
+                //m_CarRigidbody.angularVelocity = Vector3.zero;
             }
             // -----------------------------------------------------------
         }
@@ -242,8 +245,10 @@ public class CarBehaviour : MonoBehaviour
             // -----------------------------------------------------------
         }
     }
-
-
+    bool m_IsJumping = false;
+    bool m_WasJumping = false;
+    bool m_JumpTrigger = false;
+    bool m_IsGrounded = false;
 
     void GetBodyParams()
     {
@@ -382,6 +387,62 @@ public class CarBehaviour : MonoBehaviour
         }
         m_TotalWeight = m_BodyWeight + l_TotalWheelsWeight;
         m_CarRigidbody.mass = m_TotalWeight;
+    }
+
+
+
+    void Update_Jump()
+    {
+        bool l_isAllWheelsGrounded = true;
+
+        for (int i = 0; i < m_ActiveWheels.Count; i++)
+        {
+            if (!Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, m_SpringFullDistance[i], m_CollisionMask))
+            {
+                l_isAllWheelsGrounded = false;
+                break;
+            }
+        }
+
+        float l_CarVerticalVelocity = m_CarRigidbody.linearVelocity.y;
+
+        m_IsGrounded = (l_isAllWheelsGrounded || l_CarVerticalVelocity == 0);
+
+        m_IsJumping = m_JumpAction.IsPressed() && m_IsGrounded;
+
+        m_JumpTrigger = m_IsJumping && !m_WasJumping;
+
+
+
+        // EXECUTE JUMP ------------------------
+        if (m_JumpTrigger)
+        {
+            //if (l_isAllWheelsGrounded)
+            //{
+            //    Debug.Log("All wheels grounded");
+            //    for (int i = 0; i < m_ActiveWheels.Count; i++)
+            //    {
+            //        Vector3 l_JumpDirection = m_WheelTransform[i].up;
+            //        m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_JumpForce, transform.position);
+            //    }
+            //}
+            if (l_CarVerticalVelocity == 0)
+            {
+                //Debug.Log("Car is flipped");
+                Vector3 l_JumpDirection = Vector3.up;
+
+                for (int i = 0; i < m_ActiveWheels.Count; i++)
+                {
+                    m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_TotalWeight * m_JumpFlipForce,
+                                                      m_WheelTransform[i].position + m_WheelTransform[i].forward * 1);
+                }
+            }
+        }
+        // -------------------------------------
+
+
+
+        m_WasJumping = m_IsJumping;
     }
 
 
