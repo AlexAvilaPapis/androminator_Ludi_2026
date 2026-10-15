@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -419,12 +420,13 @@ public class CarBehaviour : MonoBehaviour
         {
             //if (l_isAllWheelsGrounded)
             //{
-            //    Debug.Log("All wheels grounded");
+            ////    Debug.Log("All wheels grounded");
             //    for (int i = 0; i < m_ActiveWheels.Count; i++)
             //    {
             //        Vector3 l_JumpDirection = m_WheelTransform[i].up;
-            //        m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_JumpForce, transform.position);
+            //        m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_JumpAcceleration, m_WheelTransform[i].position);
             //    }
+            ////    m_CarRigidbody.angularVelocity = Vector3.zero;
             //}
             if (l_CarVerticalVelocity == 0)
             {
@@ -444,7 +446,6 @@ public class CarBehaviour : MonoBehaviour
 
         m_WasJumping = m_IsJumping;
     }
-
 
 
     private void OnEnable()
