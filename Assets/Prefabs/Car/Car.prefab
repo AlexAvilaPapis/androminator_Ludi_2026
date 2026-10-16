@@ -128,7 +128,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   m_JumpAcceleration: 10
-  m_JumpFlipForce: 60
+  m_JumpFlipForce: 75
   m_Wheels:
   - {fileID: 3081006533883227292}
   - {fileID: 8048663150390171654}
