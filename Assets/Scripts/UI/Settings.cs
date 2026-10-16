@@ -1,16 +1,15 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Settings : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void StartGame()
     {
-        
+        SceneManager.LoadScene(1);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ReturnToMenu()
     {
-        
+        SceneManager.LoadScene(0);
     }
 }
