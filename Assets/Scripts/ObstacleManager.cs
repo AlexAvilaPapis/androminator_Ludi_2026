@@ -59,7 +59,7 @@ public class ObstacleManager : MonoBehaviour
             Debug.Log($"Obstacle {i}: {order[i]}");
             
         }
-        SpawnOrder();
+        //SpawnOrder();
     }
 
 
