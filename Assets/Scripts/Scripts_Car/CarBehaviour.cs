@@ -59,6 +59,7 @@ public class CarBehaviour : MonoBehaviour
     MeshFilter[] m_WheelMeshFilter;
     Renderer[] m_WheelRenderer;
 
+    float[] m_SpringPosition;
     float[] m_SpringFullDistance;
     float[] m_SpringRestDistance;
     float[] m_SpringForce;
@@ -152,7 +153,7 @@ public class CarBehaviour : MonoBehaviour
 
     void ApplyForces(int i)
     {
-        bool l_IsWheelGrounded = Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, out m_WheelRayHit[i], m_SpringFullDistance[i], m_CollisionMask);
+        bool l_IsWheelGrounded = Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, out m_WheelRayHit[i], m_SpringPosition[i] + m_SpringFullDistance[i], m_CollisionMask);
 
         if (l_IsWheelGrounded)
         {
@@ -162,7 +163,7 @@ public class CarBehaviour : MonoBehaviour
 
             Vector3 l_WheelWorldVelocity = m_CarRigidbody.GetPointVelocity(m_WheelTransform[i].position);
 
-            float l_Offset = m_SpringRestDistance[i] - m_WheelRayHit[i].distance;
+            float l_Offset = m_SpringPosition[i] + m_SpringRestDistance[i] - m_WheelRayHit[i].distance;
 
             float l_VerticalVelocity = Vector3.Dot(l_SpringDirection, l_WheelWorldVelocity);
 
@@ -257,8 +258,8 @@ public class CarBehaviour : MonoBehaviour
 
             float l_SpringSpeed = Vector3.Dot(m_WheelTransform[i].up, l_VerticalSpeed);
 
-            m_WheelMeshTransform[i].position -= m_WheelTransform[i].up * l_SpringSpeed / m_SpringDamper[i];
-            m_WheelMeshTransform[i].localPosition = Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
+            m_WheelMeshTransform[i].position -= m_WheelTransform[i].up * l_SpringSpeed / m_SpringDamper[i] * Time.deltaTime;
+            m_WheelMeshTransform[i].localPosition = new Vector3(0, -m_SpringPosition[i],0) + Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
             // -----------------------------------------------------------
         }
     }
@@ -352,6 +353,7 @@ public class CarBehaviour : MonoBehaviour
             m_WheelMeshTransform[i] = m_WheelRenderer[i].transform;
 
             WheelParams l_WheelParams = m_WheelBehaviour[i].m_WheelParams;
+            m_SpringPosition[i] = l_WheelParams.m_SpringPosition;
             m_SpringFullDistance[i] = l_WheelParams.m_SpringFullDistance;
             m_SpringRestDistance[i] = l_WheelParams.m_SpringRestDistance;
             m_SpringForce[i] = l_WheelParams.m_SpringForce;
@@ -378,6 +380,7 @@ public class CarBehaviour : MonoBehaviour
         m_WheelMeshFilter = new MeshFilter[i];
         m_WheelRenderer = new Renderer[i];
 
+        m_SpringPosition = new float[i];
         m_SpringFullDistance = new float[i];
         m_SpringRestDistance = new float[i];
         m_SpringForce = new float[i];
