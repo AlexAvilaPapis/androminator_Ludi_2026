@@ -1,26 +1,26 @@
-public enum ObstacleType
-{
-    VALLAS_SIMPLE,
-    VALLAS_GRUPO,
-    BALANCIN,
-    TUNEL_FLEXIBLE,
-    TUNEL_RIGIDO,
-    MURO,
-    EMPALIZADA,
-    RUEDA,
-    MESA,
-    SLALOM,
-    SALTO_LONG,
-    PASARELA
-}
+//public enum ObstacleType
+//{
+//    VALLAS_SIMPLE,
+//    VALLAS_GRUPO,
+//    BALANCIN,
+//    TUNEL_FLEXIBLE,
+//    TUNEL_RIGIDO,
+//    MURO,
+//    EMPALIZADA,
+//    RUEDA,
+//    MESA,
+//    SLALOM,
+//    SALTO_LONG,
+//    PASARELA
+//}
 
 public enum ContactObstacleType
 {
     BALANCIN,
     TUNEL_FLEXIBLE,
-    TUNEL_RIGIDO,
+    //TUNEL_RIGIDO,
     EMPALIZADA,
-    MESA,
+    //MESA,
     SLALOM,
     PASARELA
 }
