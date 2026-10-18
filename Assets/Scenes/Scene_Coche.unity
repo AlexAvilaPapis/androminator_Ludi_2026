@@ -814,6 +814,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Car
       objectReference: {fileID: 0}
+    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_JumpFlipForce
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7871970466851944215, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -22.59

@@ -434,7 +434,7 @@ public class CarBehaviour : MonoBehaviour
 
 
         // EXECUTE JUMP ------------------------
-        if (m_JumpTrigger)
+        //if (m_JumpTrigger)
         {
             //if (l_isAllWheelsGrounded)
             //{
