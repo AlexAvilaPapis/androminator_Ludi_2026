@@ -134,6 +134,11 @@ MonoBehaviour:
   - {fileID: 8048663150390171654}
   - {fileID: 296049470565097140}
   - {fileID: 5277273960091658422}
+  m_TerrainMaterial: {fileID: 2100000, guid: 3d2a595fb5f277f49be7f9a95d71435f, type: 2}
+  m_DirtSpeedMultiplier: 1
+  m_DirtAdditionalGrip: 0
+  m_GrassSpeedMultiplier: 0.5
+  m_GrassAdditionalGrip: -0.3
 --- !u!1 &6220004269182864592
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,7 +307,7 @@ PrefabInstance:
     - target: {fileID: 1262238127892866047, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_WheelParams
       value: 
-      objectReference: {fileID: 11400000, guid: d530c9b7d8f60cc4a83548cc3a0f1629, type: 2}
+      objectReference: {fileID: 11400000, guid: 31d5b250e6875d44c8326831be09e004, type: 2}
     - target: {fileID: 1933656382772247551, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.8
@@ -381,7 +386,7 @@ PrefabInstance:
     - target: {fileID: 1262238127892866047, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_WheelParams
       value: 
-      objectReference: {fileID: 11400000, guid: d530c9b7d8f60cc4a83548cc3a0f1629, type: 2}
+      objectReference: {fileID: 11400000, guid: 31d5b250e6875d44c8326831be09e004, type: 2}
     - target: {fileID: 1933656382772247551, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.8
@@ -460,7 +465,7 @@ PrefabInstance:
     - target: {fileID: 1262238127892866047, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_WheelParams
       value: 
-      objectReference: {fileID: 11400000, guid: d530c9b7d8f60cc4a83548cc3a0f1629, type: 2}
+      objectReference: {fileID: 11400000, guid: 31d5b250e6875d44c8326831be09e004, type: 2}
     - target: {fileID: 1933656382772247551, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.8
@@ -539,7 +544,7 @@ PrefabInstance:
     - target: {fileID: 1262238127892866047, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_WheelParams
       value: 
-      objectReference: {fileID: 11400000, guid: d530c9b7d8f60cc4a83548cc3a0f1629, type: 2}
+      objectReference: {fileID: 11400000, guid: 31d5b250e6875d44c8326831be09e004, type: 2}
     - target: {fileID: 1933656382772247551, guid: 15c706ccf7f5f724f83ff7f73c2ff2ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.8

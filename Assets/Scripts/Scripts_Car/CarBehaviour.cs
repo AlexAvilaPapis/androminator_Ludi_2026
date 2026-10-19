@@ -14,10 +14,14 @@ public class CarBehaviour : MonoBehaviour
     InputAction m_JumpAction;
 
     // GENERAL DATA -----------------
+    [Header("CAR DATA")]
     [SerializeField] float m_MaxWheelAngle = 15.0f;
     [SerializeField] float m_MaxCarSpeed = 30.0f;
 
     [SerializeField] AnimationCurve m_SpeedCurve;
+
+    [SerializeField] float m_JumpAcceleration = 10.0f;
+    [SerializeField] float m_JumpFlipForce = 10.0f;
 
     float m_HorizontalInput = 0.0f;
     float m_VerticalInput = 0.0f;
@@ -26,14 +30,15 @@ public class CarBehaviour : MonoBehaviour
     float m_CurrentCarSpeed = 0.0f;
 
     float m_TotalWeight;
+
+    Rigidbody m_CarRigidbody;
+
+    [SerializeField] List<GameObject> m_Wheels;
     // ------------------------------
 
 
 
     // BODY DATA -----------------
-    [SerializeField] float m_JumpAcceleration = 10.0f;
-    [SerializeField] float m_JumpFlipForce = 60.0f;
-
     BodyBehaviour m_BodyBehaviour;
     MeshFilter m_BodyMeshFilter;
     Renderer m_BodyRenderer;
@@ -47,7 +52,6 @@ public class CarBehaviour : MonoBehaviour
     Vector3 m_FrontWheelPosition = new Vector3(0.8f, -0.5f, 1.0f);
     Vector3 m_BackWheelPosition = new Vector3(0.8f, -0.5f, -1.0f);
     // ---------------------------
-    public List<GameObject> m_Wheels;
     List<GameObject> m_ActiveWheels = new List<GameObject>();
 
 
@@ -72,7 +76,26 @@ public class CarBehaviour : MonoBehaviour
     // ---------------------------------
     RaycastHit[] m_WheelRayHit;
 
-    Rigidbody m_CarRigidbody;
+
+
+    // TERRAIN DATA --------------------
+    [Header("TERRAIN DATA")]
+    [SerializeField] Material m_TerrainMaterial;
+    Texture2D m_TerrainMask;
+
+    float[] m_TerrainMaskValue;
+
+    float[] m_CurrentSpeedMultiplier;
+    float[] m_CurrentAdditionalGrip;
+    // Road
+    [SerializeField] float m_RoadSpeedMultiplier = 1.0f;
+    [SerializeField] float m_RoadAdditionalGrip = 0.0f;
+
+    // Grass
+    [SerializeField] float m_GrassSpeedMultiplier = 0.5f;
+    [SerializeField] float m_GrassAdditionalGrip = -0.3f;
+    // ---------------------------------
+
 
 
 
@@ -86,6 +109,8 @@ public class CarBehaviour : MonoBehaviour
 
     private void Start()
     {
+        m_TerrainMask = (Texture2D) m_TerrainMaterial.GetTexture("_MaskTex");
+
         GetBodyParams();
         //GetWheelParams();
     }
@@ -157,6 +182,23 @@ public class CarBehaviour : MonoBehaviour
 
         if (l_IsWheelGrounded)
         {
+            // Detect terrain tex coords ---------------------------------
+            if (m_WheelRayHit[i].transform.name == "Terrain")
+            {
+                m_TerrainMaskValue[i] = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y).r;
+
+                m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_RoadSpeedMultiplier, m_GrassSpeedMultiplier, m_TerrainMaskValue[i]);
+                m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_RoadAdditionalGrip, m_GrassAdditionalGrip, m_TerrainMaskValue[i]);
+            }
+            else
+            {
+                m_CurrentSpeedMultiplier[i] = 1.0f;
+                m_CurrentAdditionalGrip[i] = 0.0f;
+            }
+            // -----------------------------------------------------------
+
+
+
             // SUSPENSION ------------------------------------------------
             //Vector3 l_SpringDirection = m_WheelRayHit[i].normal;
             Vector3 l_SpringDirection = m_WheelTransform[i].up;
@@ -186,7 +228,9 @@ public class CarBehaviour : MonoBehaviour
 
             float l_SteeringVelocity = Vector3.Dot(l_SteeringDirection, l_WheelWorldVelocity);
 
-            float l_DesiredVelocityChange = -l_SteeringVelocity * m_WheelGripFactor[i];
+            float l_TotalGripFactor = m_WheelGripFactor[i] + m_CurrentAdditionalGrip[i];
+
+            float l_DesiredVelocityChange = -l_SteeringVelocity * l_TotalGripFactor;
 
             float l_DesiredAcceleration = l_DesiredVelocityChange / 1;
 
@@ -205,7 +249,7 @@ public class CarBehaviour : MonoBehaviour
 
                 float l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
 
-                float l_CarSpeedNormalized = Mathf.Clamp01(Mathf.Abs(l_CarSpeed) / m_MaxCarSpeed);
+                float l_CarSpeedNormalized = Mathf.Clamp01(Mathf.Abs(l_CarSpeed) / (m_MaxCarSpeed * m_CurrentSpeedMultiplier[i]) );
 
                 float l_Acceleration = 0.0f;
                 if (m_CurrentCarSpeed != 0)
@@ -214,7 +258,7 @@ public class CarBehaviour : MonoBehaviour
                 }
                 else
                 {
-                    l_Acceleration = -Mathf.Sign(l_CarSpeed) * 1 / 10 * m_MaxCarSpeed;
+                    l_Acceleration = -Mathf.Sign(l_CarSpeed) * 1 / 10 * m_MaxCarSpeed * (1 - m_CurrentAdditionalGrip[i]);
                 }
 
                 m_CarRigidbody.AddForceAtPosition(l_AccelerationDirection * l_Acceleration / m_FrontWheelsAmount, m_WheelTransform[i].position);
@@ -392,6 +436,12 @@ public class CarBehaviour : MonoBehaviour
         m_WheelWeight = new float[i];
 
         m_WheelRayHit = new RaycastHit[i];
+
+
+
+        m_TerrainMaskValue = new float[i];
+        m_CurrentSpeedMultiplier = new float[i];
+        m_CurrentAdditionalGrip = new float[i];
     }
 
 
