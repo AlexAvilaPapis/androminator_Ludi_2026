@@ -109,7 +109,8 @@ public class CarBehaviour : MonoBehaviour
 
     private void Start()
     {
-        m_TerrainMask = (Texture2D) m_TerrainMaterial.GetTexture("_MaskTex");
+        if(m_TerrainMaterial != null)
+            m_TerrainMask = (Texture2D) m_TerrainMaterial.GetTexture("_MaskTex");
 
         GetBodyParams();
         //GetWheelParams();
@@ -185,7 +186,10 @@ public class CarBehaviour : MonoBehaviour
             // Detect terrain tex coords ---------------------------------
             if (m_WheelRayHit[i].transform.name == "Terrain")
             {
-                m_TerrainMaskValue[i] = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y).r;
+                if (m_TerrainMaterial != null)
+                    m_TerrainMaskValue[i] = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y).r;
+                else
+                    m_TerrainMaskValue[i] = 0;
 
                 m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_RoadSpeedMultiplier, m_GrassSpeedMultiplier, m_TerrainMaskValue[i]);
                 m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_RoadAdditionalGrip, m_GrassAdditionalGrip, m_TerrainMaskValue[i]);
