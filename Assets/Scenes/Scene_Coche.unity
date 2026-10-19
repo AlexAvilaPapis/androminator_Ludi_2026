@@ -821,7 +821,7 @@ PrefabInstance:
     - target: {fileID: 2731008436196796597, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_BodyParams
       value: 
-      objectReference: {fileID: 11400000, guid: ef421140ccc19074f936bd8e9dabab98, type: 2}
+      objectReference: {fileID: 11400000, guid: 93fae6f10f8826e408462506edd990da, type: 2}
     - target: {fileID: 3887167910847748174, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_WheelParams
       value: 
