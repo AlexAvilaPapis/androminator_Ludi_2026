@@ -191,8 +191,8 @@ public class CarBehaviour : MonoBehaviour
                 else
                     m_TerrainMaskValue[i] = 0;
 
-                m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_RoadSpeedMultiplier, m_GrassSpeedMultiplier, m_TerrainMaskValue[i]);
-                m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_RoadAdditionalGrip, m_GrassAdditionalGrip, m_TerrainMaskValue[i]);
+                m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_GrassSpeedMultiplier, m_RoadSpeedMultiplier, m_TerrainMaskValue[i]);
+                m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_GrassAdditionalGrip, m_RoadAdditionalGrip, m_TerrainMaskValue[i]);
             }
             else
             {
