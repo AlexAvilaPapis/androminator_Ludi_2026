@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -73,6 +74,8 @@ public class CarBehaviour : MonoBehaviour
 
     float[] m_WheelGripFactor;
     float[] m_WheelWeight;
+
+    float[] m_WheelCurrentRotation;
     // ---------------------------------
     RaycastHit[] m_WheelRayHit;
 
@@ -176,7 +179,7 @@ public class CarBehaviour : MonoBehaviour
 
 
 
-
+    float m_CarVelocitySign = 0;
     void ApplyForces(int i)
     {
         bool l_IsWheelGrounded = Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, out m_WheelRayHit[i], m_SpringPosition[i] + m_SpringFullDistance[i], m_CollisionMask);
@@ -280,12 +283,24 @@ public class CarBehaviour : MonoBehaviour
 
                 m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_TotalWeight * m_JumpAcceleration, m_WheelTransform[i].position);
                 //m_CarRigidbody.angularVelocity = Vector3.zero;
+
+                m_CarVelocitySign = Mathf.Sign(Vector3.Dot(transform.forward, m_CarRigidbody.linearVelocity));
             }
             // -----------------------------------------------------------
 
 
 
-            // Apply weight to swing -------------------------------------
+            // Rotate wheels ---------------------------------------------
+            float l_CarVelocity = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
+
+            m_WheelCurrentRotation[i] += l_CarVelocity / m_SpringRestDistance[i] * Mathf.Rad2Deg * Time.deltaTime;
+
+            m_WheelTransform[i].GetChild(0).localRotation = Quaternion.Euler(m_WheelCurrentRotation[i], 0f, 0f);
+            // -----------------------------------------------------------
+
+
+
+            // Apply weight to swing obstacle ----------------------------
             if (m_WheelRayHit[i].transform.name == "Columpio")
             {
                 Rigidbody l_SwingRigidbody = m_WheelRayHit[i].transform.GetComponent<Rigidbody>();
@@ -297,7 +312,6 @@ public class CarBehaviour : MonoBehaviour
         else
         {
             m_CarRigidbody.angularDamping = 1.0f;
-            //Debug.Log(m_WheelTransform[i].name + ": On Air");
 
             // WHEELS GRAVITY --------------------------------------------
             Vector3 l_WheelWorldVelocity = m_CarRigidbody.GetPointVelocity(m_WheelTransform[i].position);
@@ -308,6 +322,16 @@ public class CarBehaviour : MonoBehaviour
 
             m_WheelMeshTransform[i].position -= m_WheelTransform[i].up * l_SpringSpeed / m_SpringDamper[i] * Time.deltaTime;
             m_WheelMeshTransform[i].localPosition = new Vector3(0, -m_SpringPosition[i],0) + Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
+            // -----------------------------------------------------------
+
+
+
+            // Rotate wheels ---------------------------------------------
+            float l_CarHorizontalSpeed = new Vector2(m_CarRigidbody.linearVelocity.x, m_CarRigidbody.linearVelocity.z).magnitude;
+
+            m_WheelCurrentRotation[i] += l_CarHorizontalSpeed * m_CarVelocitySign / m_SpringRestDistance[i] * Mathf.Rad2Deg * Time.deltaTime;
+
+            m_WheelTransform[i].GetChild(0).localRotation = Quaternion.Euler(m_WheelCurrentRotation[i], 0f, 0f);
             // -----------------------------------------------------------
         }
     }
@@ -446,6 +470,10 @@ public class CarBehaviour : MonoBehaviour
         m_TerrainMaskValue = new float[i];
         m_CurrentSpeedMultiplier = new float[i];
         m_CurrentAdditionalGrip = new float[i];
+
+
+
+        m_WheelCurrentRotation = new float[i];
     }
 
 
