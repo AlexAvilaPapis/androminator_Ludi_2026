@@ -236,6 +236,7 @@ public class CarBehaviour : MonoBehaviour
             float l_SteeringVelocity = Vector3.Dot(l_SteeringDirection, l_WheelWorldVelocity);
 
             float l_TotalGripFactor = m_WheelGripFactor[i] + m_CurrentAdditionalGrip[i];
+            l_TotalGripFactor = Mathf.Clamp01(l_TotalGripFactor);
 
             float l_DesiredVelocityChange = -l_SteeringVelocity * l_TotalGripFactor;
 
@@ -258,10 +259,11 @@ public class CarBehaviour : MonoBehaviour
 
                 float l_CarSpeedNormalized = Mathf.Clamp01(Mathf.Abs(l_CarSpeed) / (m_MaxCarSpeed * m_CurrentSpeedMultiplier[i]) );
 
+                float l_Verticality = Vector3.Dot(Vector3.up, transform.forward * Mathf.Sign(m_VerticalInput));
                 float l_Acceleration = 0.0f;
                 if (m_CurrentCarSpeed != 0)
                 {
-                    l_Acceleration = m_SpeedCurve.Evaluate(l_CarSpeedNormalized) * m_CurrentCarSpeed;
+                    l_Acceleration = m_SpeedCurve.Evaluate(l_CarSpeedNormalized) * m_CurrentCarSpeed * (1 - l_Verticality);
                 }
                 else
                 {
