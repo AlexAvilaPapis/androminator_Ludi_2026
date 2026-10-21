@@ -20,4 +20,4 @@ MonoBehaviour:
   m_WheelGripFactor: 0.4
   m_WheelWeight: 2
   m_WheelMesh: {fileID: -7987132419884788245, guid: 91d71481ac64f60449914795a172640c, type: 3}
-  m_WheelMaterial: {fileID: 2100000, guid: d0575669550d8dd4b9be6ec290937649, type: 2}
+  m_WheelMaterial: {fileID: 2100000, guid: 610e4344792efd848bd3245019a29d2c, type: 2}
