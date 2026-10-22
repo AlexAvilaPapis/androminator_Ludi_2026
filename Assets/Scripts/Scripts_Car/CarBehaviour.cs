@@ -83,10 +83,9 @@ public class CarBehaviour : MonoBehaviour
 
     // TERRAIN DATA --------------------
     [Header("TERRAIN DATA")]
-    [SerializeField] Material m_TerrainMaterial;
+    [SerializeField] GameObject m_Terrain;
+    Material m_TerrainMaterial;
     Texture2D m_TerrainMask;
-
-    float[] m_TerrainMaskValue;
 
     float[] m_CurrentSpeedMultiplier;
     float[] m_CurrentAdditionalGrip;
@@ -116,8 +115,7 @@ public class CarBehaviour : MonoBehaviour
 
     private void Start()
     {
-        if (m_TerrainMaterial != null)
-            m_TerrainMask = (Texture2D)m_TerrainMaterial.GetTexture("_MaskTex");
+        m_TerrainMask = (Texture2D)m_Terrain.GetComponent<MeshRenderer>().material.GetTexture("_MaskTex");
 
         GetBodyParams();
         //GetWheelParams();
@@ -193,21 +191,25 @@ public class CarBehaviour : MonoBehaviour
             // Detect terrain mask color ---------------------------------
             if (m_WheelRayHit[i].transform.name == "Terrain")
             {
-                Color l_TerrainMaskColor = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y);
-                //Debug.Log(l_TerrainMaskColor);
-                if (m_TerrainMaterial != null)
+                if (m_TerrainMask != null)
                 {
+                    Color l_TerrainMaskColor = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y);
+                    //Debug.Log(l_TerrainMaskColor);
+
+                    // BLACK
+                    m_CurrentSpeedMultiplier[i] = m_GrassSpeedMultiplier;
+                    m_CurrentAdditionalGrip[i] = m_GrassAdditionalGrip;
+                    // RED
+                    if (l_TerrainMaskColor.r > 0)
+                    {
+                        m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_CurrentSpeedMultiplier[i], m_RoadSpeedMultiplier, l_TerrainMaskColor.r);
+                        m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_CurrentAdditionalGrip[i], m_RoadAdditionalGrip, l_TerrainMaskColor.r);
+                    }
+                    // BLUE
                     if (l_TerrainMaskColor.b > 0)
                     {
-                        float l_SpeedMultiplier = Mathf.Lerp(m_GrassSpeedMultiplier, m_RoadSpeedMultiplier, l_TerrainMaskColor.r);
-                        float l_AdditionalGrip = Mathf.Lerp(m_GrassAdditionalGrip, m_RoadAdditionalGrip, l_TerrainMaskColor.r);
-                        m_CurrentSpeedMultiplier[i] = Mathf.Lerp(l_SpeedMultiplier, m_MudSpeedMultiplier, l_TerrainMaskColor.b);
-                        m_CurrentAdditionalGrip[i] = Mathf.Lerp(l_AdditionalGrip, m_MudAdditionalGrip, l_TerrainMaskColor.b);
-                    }
-                    else
-                    {
-                        m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_GrassSpeedMultiplier, m_RoadSpeedMultiplier, l_TerrainMaskColor.r);
-                        m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_GrassAdditionalGrip, m_RoadAdditionalGrip, l_TerrainMaskColor.r);
+                        m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_CurrentSpeedMultiplier[i], m_MudSpeedMultiplier, l_TerrainMaskColor.b);
+                        m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_CurrentAdditionalGrip[i], m_MudAdditionalGrip, l_TerrainMaskColor.b);
                     }
                 }
                 else
@@ -490,7 +492,6 @@ public class CarBehaviour : MonoBehaviour
 
 
 
-        m_TerrainMaskValue = new float[i];
         m_CurrentSpeedMultiplier = new float[i];
         m_CurrentAdditionalGrip = new float[i];
 

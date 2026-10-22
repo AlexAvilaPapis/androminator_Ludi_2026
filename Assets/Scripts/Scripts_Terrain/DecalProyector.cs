@@ -25,9 +25,13 @@ public class DecalProyector : MonoBehaviour
     Color32[] m_TerrainMaskPixels;
     Color32[] m_DecalMaskPixels;
 
-    private void Start()
+    private void Awake()
     {
         PaintDecal();
+    }
+    private void Start()
+    {
+        //PaintDecal();
     }
 
     public void PaintDecal()

@@ -759,7 +759,7 @@ PrefabInstance:
       objectReference: {fileID: 2800000, guid: cf50d91a31735d847b21173d80c5885e, type: 3}
     - target: {fileID: 2134982262605909408, guid: 4dfa10e578c91594a80b2cdb19135dd5, type: 3}
       propertyPath: m_DecalMaskSize
-      value: 64
+      value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 3571824299617123908, guid: 4dfa10e578c91594a80b2cdb19135dd5, type: 3}
       propertyPath: m_Name
@@ -887,6 +887,10 @@ PrefabInstance:
       propertyPath: m_WheelParams
       value: 
       objectReference: {fileID: 11400000, guid: 31d5b250e6875d44c8326831be09e004, type: 2}
+    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_Terrain
+      value: 
+      objectReference: {fileID: 9265719}
     - target: {fileID: 6200530022244703332, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_WheelParams
       value: 
