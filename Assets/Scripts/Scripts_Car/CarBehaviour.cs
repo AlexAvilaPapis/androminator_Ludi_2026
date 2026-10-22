@@ -43,9 +43,11 @@ public class CarBehaviour : MonoBehaviour
     BodyBehaviour m_BodyBehaviour;
     MeshFilter m_BodyMeshFilter;
     Renderer m_BodyRenderer;
+    BoxCollider m_BodyCollider;
 
     float m_BodyWeight = 1.0f;
     float m_WheelTurnPower = 5.0f;
+    Vector3 m_ColliderDimensions = new Vector3(2, 1, 3);
     Mesh m_BodyMesh;
     Material m_BodyMaterial;
     int m_FrontWheelsAmount = 2;
@@ -62,7 +64,7 @@ public class CarBehaviour : MonoBehaviour
     Transform[] m_WheelTransform;
     Transform[] m_WheelMeshTransform;
     MeshFilter[] m_WheelMeshFilter;
-    Renderer[] m_WheelRenderer;
+    Renderer[] m_WheelMeshRenderer;
 
     float[] m_SpringPosition;
     float[] m_SpringFullDistance;
@@ -126,8 +128,8 @@ public class CarBehaviour : MonoBehaviour
     {
         m_TerrainMask = (Texture2D)m_Terrain.GetComponent<MeshRenderer>().material.GetTexture("_MaskTex");
 
-        GetBodyParams();
-        //GetWheelParams();
+        UpdateBodyParams();
+        //UpdateWheelParams();
     }
 
     private void Update()
@@ -374,14 +376,16 @@ public class CarBehaviour : MonoBehaviour
 
 
 
-    void GetBodyParams()
+    public void UpdateBodyParams()
     {
         m_BodyBehaviour = m_Body.GetComponent<BodyBehaviour>();
         m_BodyMeshFilter = m_Body.GetComponent<MeshFilter>();
         m_BodyRenderer = m_Body.GetComponent<Renderer>();
+        m_BodyCollider = m_Body.GetComponent<BoxCollider>();
 
         m_BodyWeight = m_BodyBehaviour.m_BodyParams.m_BodyWeight;
         m_WheelTurnPower = m_BodyBehaviour.m_BodyParams.m_WheelTurnPower;
+        m_ColliderDimensions = m_BodyBehaviour.m_BodyParams.m_ColliderDimensions;
         m_BodyMesh = m_BodyBehaviour.m_BodyParams.m_BodyMesh;
         m_BodyMaterial = m_BodyBehaviour.m_BodyParams.m_BodyMaterial;
         m_FrontWheelsAmount = m_BodyBehaviour.m_BodyParams.m_FrontWheelsAmount;
@@ -391,6 +395,7 @@ public class CarBehaviour : MonoBehaviour
 
         m_BodyMeshFilter.mesh = m_BodyMesh;
         m_BodyRenderer.material = m_BodyMaterial;
+        m_BodyCollider.size = m_ColliderDimensions;
 
 
 
@@ -440,7 +445,7 @@ public class CarBehaviour : MonoBehaviour
 
         SetNewWheelsParams(m_ActiveWheels.Count);
 
-        GetWheelParams();
+        UpdateWheelParams();
 
 
 
@@ -449,7 +454,7 @@ public class CarBehaviour : MonoBehaviour
 
 
 
-    void GetWheelParams()
+    public void UpdateWheelParams()
     {
         for (int i = 0; i < m_ActiveWheels.Count; i++)
         {
@@ -457,8 +462,8 @@ public class CarBehaviour : MonoBehaviour
             m_WheelBehaviour[i] = l_Wheel.GetComponent<WheelBehaviour>();
             m_WheelTransform[i] = l_Wheel.transform;
             m_WheelMeshFilter[i] = l_Wheel.GetComponentInChildren<MeshFilter>();
-            m_WheelRenderer[i] = l_Wheel.GetComponentInChildren<Renderer>();
-            m_WheelMeshTransform[i] = m_WheelRenderer[i].transform;
+            m_WheelMeshRenderer[i] = l_Wheel.GetComponentInChildren<Renderer>();
+            m_WheelMeshTransform[i] = m_WheelMeshRenderer[i].transform;
 
             WheelParams l_WheelParams = m_WheelBehaviour[i].m_WheelParams;
             m_SpringPosition[i] = l_WheelParams.m_SpringPosition;
@@ -472,7 +477,7 @@ public class CarBehaviour : MonoBehaviour
             m_WheelWeight[i] = l_WheelParams.m_WheelWeight;
 
             m_WheelMeshFilter[i].mesh = m_WheelMesh[i];
-            m_WheelRenderer[i].material = m_WheelMaterial[i];
+            m_WheelMeshRenderer[i].material = m_WheelMaterial[i];
         }
 
 
@@ -486,7 +491,7 @@ public class CarBehaviour : MonoBehaviour
         m_WheelTransform = new Transform[i];
         m_WheelMeshTransform = new Transform[i];
         m_WheelMeshFilter = new MeshFilter[i];
-        m_WheelRenderer = new Renderer[i];
+        m_WheelMeshRenderer = new Renderer[i];
 
         m_SpringPosition = new float[i];
         m_SpringFullDistance = new float[i];
@@ -606,8 +611,8 @@ public class CarBehaviour : MonoBehaviour
 
     void Update_Deadzone()
     {
-        if (Mathf.Abs(transform.position.x) > m_DeadzoneWidth / 2 
-            || Mathf.Abs(transform.position.z) > m_DeadzoneWidth / 2 
+        if (Mathf.Abs(transform.position.x) > m_DeadzoneWidth / 2
+            || Mathf.Abs(transform.position.z) > m_DeadzoneWidth / 2
             || Mathf.Abs(transform.position.y) > m_DeadzoneHeight / 2)
         {
             transform.position = m_RespawnTransform.position;

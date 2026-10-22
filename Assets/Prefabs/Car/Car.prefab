@@ -134,11 +134,17 @@ MonoBehaviour:
   - {fileID: 8048663150390171654}
   - {fileID: 296049470565097140}
   - {fileID: 5277273960091658422}
-  m_TerrainMaterial: {fileID: 2100000, guid: 3d2a595fb5f277f49be7f9a95d71435f, type: 2}
-  m_DirtSpeedMultiplier: 1
-  m_DirtAdditionalGrip: 0
+  m_Terrain: {fileID: 0}
+  m_RoadSpeedMultiplier: 1
+  m_RoadAdditionalGrip: 0
   m_GrassSpeedMultiplier: 0.5
   m_GrassAdditionalGrip: -0.3
+  m_MudSpeedMultiplier: 0.25
+  m_MudAdditionalGrip: -0.2
+  m_DeadzoneWidth: 1000
+  m_DeadzoneHeight: 500
+  m_DeadzoneColor: {r: 1, g: 0, b: 0, a: 1}
+  m_RespawnTransform: {fileID: 0}
 --- !u!1 &6220004269182864592
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,7 +218,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6929105299012079672}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 5060444177187149915, guid: c02fa745f5dc3ca47bc07741eb62bd4d, type: 3}
 --- !u!23 &3422422549748569364
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -274,7 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3337851ebf5a47b49acc74716f265c3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BodyBehaviour
-  m_BodyParams: {fileID: 11400000, guid: 93fae6f10f8826e408462506edd990da, type: 2}
+  m_BodyParams: {fileID: 11400000, guid: 06b3296a491c51e40965641640cabca3, type: 2}
 --- !u!65 &8974676050098032707
 BoxCollider:
   m_ObjectHideFlags: 0

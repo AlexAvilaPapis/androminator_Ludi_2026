@@ -914,6 +914,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Car
       objectReference: {fileID: 0}
+    - target: {fileID: 2731008436196796597, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_BodyParams
+      value: 
+      objectReference: {fileID: 11400000, guid: 06b3296a491c51e40965641640cabca3, type: 2}
     - target: {fileID: 3887167910847748174, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_WheelParams
       value: 
@@ -922,18 +926,6 @@ PrefabInstance:
       propertyPath: m_Terrain
       value: 
       objectReference: {fileID: 9265719}
-    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
-      propertyPath: m_DeadzoneColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
-      propertyPath: m_DeadzoneColor.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
-      propertyPath: m_DeadzoneColor.r
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_RespawnTransform
       value: 
