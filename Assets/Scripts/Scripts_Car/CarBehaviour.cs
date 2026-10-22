@@ -97,6 +97,10 @@ public class CarBehaviour : MonoBehaviour
     // Grass
     [SerializeField] float m_GrassSpeedMultiplier = 0.5f;
     [SerializeField] float m_GrassAdditionalGrip = -0.3f;
+
+    // Mud
+    [SerializeField] float m_MudSpeedMultiplier = 0.25f;
+    [SerializeField] float m_MudAdditionalGrip = -0.2f;
     // ---------------------------------
 
 
@@ -112,8 +116,8 @@ public class CarBehaviour : MonoBehaviour
 
     private void Start()
     {
-        if(m_TerrainMaterial != null)
-            m_TerrainMask = (Texture2D) m_TerrainMaterial.GetTexture("_MaskTex");
+        if (m_TerrainMaterial != null)
+            m_TerrainMask = (Texture2D)m_TerrainMaterial.GetTexture("_MaskTex");
 
         GetBodyParams();
         //GetWheelParams();
@@ -186,22 +190,39 @@ public class CarBehaviour : MonoBehaviour
 
         if (l_IsWheelGrounded)
         {
-            // Detect terrain tex coords ---------------------------------
+            // Detect terrain mask color ---------------------------------
             if (m_WheelRayHit[i].transform.name == "Terrain")
             {
+                Color l_TerrainMaskColor = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y);
+                //Debug.Log(l_TerrainMaskColor);
                 if (m_TerrainMaterial != null)
-                    m_TerrainMaskValue[i] = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y).r;
+                {
+                    if (l_TerrainMaskColor.b > 0)
+                    {
+                        float l_SpeedMultiplier = Mathf.Lerp(m_GrassSpeedMultiplier, m_RoadSpeedMultiplier, l_TerrainMaskColor.r);
+                        float l_AdditionalGrip = Mathf.Lerp(m_GrassAdditionalGrip, m_RoadAdditionalGrip, l_TerrainMaskColor.r);
+                        m_CurrentSpeedMultiplier[i] = Mathf.Lerp(l_SpeedMultiplier, m_MudSpeedMultiplier, l_TerrainMaskColor.b);
+                        m_CurrentAdditionalGrip[i] = Mathf.Lerp(l_AdditionalGrip, m_MudAdditionalGrip, l_TerrainMaskColor.b);
+                    }
+                    else
+                    {
+                        m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_GrassSpeedMultiplier, m_RoadSpeedMultiplier, l_TerrainMaskColor.r);
+                        m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_GrassAdditionalGrip, m_RoadAdditionalGrip, l_TerrainMaskColor.r);
+                    }
+                }
                 else
-                    m_TerrainMaskValue[i] = 0;
-
-                m_CurrentSpeedMultiplier[i] = Mathf.Lerp(m_GrassSpeedMultiplier, m_RoadSpeedMultiplier, m_TerrainMaskValue[i]);
-                m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_GrassAdditionalGrip, m_RoadAdditionalGrip, m_TerrainMaskValue[i]);
+                {
+                    m_CurrentSpeedMultiplier[i] = 1.0f;
+                    m_CurrentAdditionalGrip[i] = 0.0f;
+                }
             }
             else
             {
                 m_CurrentSpeedMultiplier[i] = 1.0f;
                 m_CurrentAdditionalGrip[i] = 0.0f;
             }
+
+            //Debug.Log("Speed mult: " + m_CurrentSpeedMultiplier[i] + " | Add Grip: " + m_CurrentAdditionalGrip[i]);
             // -----------------------------------------------------------
 
 
@@ -257,7 +278,7 @@ public class CarBehaviour : MonoBehaviour
 
                 float l_CarSpeed = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
 
-                float l_CarSpeedNormalized = Mathf.Clamp01(Mathf.Abs(l_CarSpeed) / (m_MaxCarSpeed * m_CurrentSpeedMultiplier[i]) );
+                float l_CarSpeedNormalized = Mathf.Clamp01(Mathf.Abs(l_CarSpeed) / (m_MaxCarSpeed * m_CurrentSpeedMultiplier[i]));
 
                 float l_Verticality = Vector3.Dot(Vector3.up, transform.forward * Mathf.Sign(m_VerticalInput));
                 float l_Acceleration = 0.0f;
@@ -323,7 +344,7 @@ public class CarBehaviour : MonoBehaviour
             float l_SpringSpeed = Vector3.Dot(m_WheelTransform[i].up, l_VerticalSpeed);
 
             m_WheelMeshTransform[i].position -= m_WheelTransform[i].up * l_SpringSpeed / m_SpringDamper[i] * Time.deltaTime;
-            m_WheelMeshTransform[i].localPosition = new Vector3(0, -m_SpringPosition[i],0) + Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
+            m_WheelMeshTransform[i].localPosition = new Vector3(0, -m_SpringPosition[i], 0) + Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
             // -----------------------------------------------------------
 
 
