@@ -84,7 +84,6 @@ public class CarBehaviour : MonoBehaviour
     // TERRAIN DATA --------------------
     [Header("TERRAIN DATA")]
     [SerializeField] GameObject m_Terrain;
-    Material m_TerrainMaterial;
     Texture2D m_TerrainMask;
 
     float[] m_CurrentSpeedMultiplier;
@@ -100,6 +99,16 @@ public class CarBehaviour : MonoBehaviour
     // Mud
     [SerializeField] float m_MudSpeedMultiplier = 0.25f;
     [SerializeField] float m_MudAdditionalGrip = -0.2f;
+    // ---------------------------------
+
+
+
+    // DEADZONE ------------------------
+    [Header("DEADZONE DATA")]
+    [SerializeField] float m_DeadzoneWidth = 1000.0f;
+    [SerializeField] float m_DeadzoneHeight = 500.0f;
+    [SerializeField] Color m_DeadzoneColor = Color.red;
+    [SerializeField] Transform m_RespawnTransform;
     // ---------------------------------
 
 
@@ -133,6 +142,8 @@ public class CarBehaviour : MonoBehaviour
         ApplyMovementInput();
 
         if (!m_IsGrounded) Update_OnAirRoll();
+
+        Update_Deadzone();
     }
 
 
@@ -591,6 +602,34 @@ public class CarBehaviour : MonoBehaviour
         m_CarRigidbody.angularVelocity += l_PitchRotation + l_RollRotation;
     }
 
+
+
+    void Update_Deadzone()
+    {
+        if (Mathf.Abs(transform.position.x) > m_DeadzoneWidth / 2 
+            || Mathf.Abs(transform.position.z) > m_DeadzoneWidth / 2 
+            || Mathf.Abs(transform.position.y) > m_DeadzoneHeight / 2)
+        {
+            transform.position = m_RespawnTransform.position;
+            transform.rotation = m_RespawnTransform.rotation;
+            StartCoroutine(ResetCar());
+        }
+    }
+    IEnumerator ResetCar()
+    {
+        m_CarRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        m_CarRigidbody.isKinematic = true;
+
+        yield return new WaitForEndOfFrame();
+
+        m_CarRigidbody.isKinematic = false;
+        m_CarRigidbody.constraints = RigidbodyConstraints.None;
+
+        yield return null;
+    }
+
+
+
     private void OnEnable()
     {
         m_InputActionAsset.FindActionMap("Player").Enable();
@@ -598,5 +637,12 @@ public class CarBehaviour : MonoBehaviour
     private void OnDisable()
     {
         m_InputActionAsset.FindActionMap("Player").Disable();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = m_DeadzoneColor;
+
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(m_DeadzoneWidth, m_DeadzoneHeight, m_DeadzoneWidth));
     }
 }

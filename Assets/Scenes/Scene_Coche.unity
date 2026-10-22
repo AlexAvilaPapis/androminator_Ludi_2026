@@ -499,6 +499,37 @@ MonoBehaviour:
   m_TargetTransform: {fileID: 1888739907}
   m_MaxDistanceToTarget: 10
   m_CameraHeight: 5
+--- !u!1 &891434957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 891434958}
+  m_Layer: 0
+  m_Name: PlayerRespawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &891434958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891434957}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 6.4, z: -27.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1264931265
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,6 +922,22 @@ PrefabInstance:
       propertyPath: m_Terrain
       value: 
       objectReference: {fileID: 9265719}
+    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_DeadzoneColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_DeadzoneColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_DeadzoneColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4726413784744265745, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
+      propertyPath: m_RespawnTransform
+      value: 
+      objectReference: {fileID: 891434958}
     - target: {fileID: 6200530022244703332, guid: 0fee4528bb935144bb4c40ac63e9a42d, type: 3}
       propertyPath: m_WheelParams
       value: 
@@ -956,3 +1003,4 @@ SceneRoots:
   - {fileID: 2261972536526099326}
   - {fileID: 1264931269}
   - {fileID: 373028976612387575}
+  - {fileID: 891434958}
