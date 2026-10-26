@@ -105,6 +105,21 @@ public class CarBehaviour : MonoBehaviour
 
 
 
+    // DOG DATA ------------------------
+    public enum DogType
+    {
+        Chihuahua = 0,
+        Beagle,
+        PastorAleman,
+        BorderCollie
+    }
+    [Header("DOG DATA")]
+    [SerializeField] DogType m_CurrentDogType = DogType.Chihuahua;
+    [SerializeField] GameObject[] m_DogObjects;
+    // ---------------------------------
+
+
+
     // DEADZONE ------------------------
     [Header("DEADZONE DATA")]
     [SerializeField] float m_DeadzoneWidth = 1000.0f;
@@ -130,6 +145,7 @@ public class CarBehaviour : MonoBehaviour
 
         UpdateBodyParams();
         //UpdateWheelParams();
+        SetDogType(m_CurrentDogType);
     }
 
     private void Update()
@@ -484,7 +500,6 @@ public class CarBehaviour : MonoBehaviour
 
         CalculateCarWeight();
     }
-
     void SetNewWheelsParams(int i)
     {
         m_WheelBehaviour = new WheelBehaviour[i];
@@ -514,6 +529,25 @@ public class CarBehaviour : MonoBehaviour
 
 
         m_WheelCurrentRotation = new float[i];
+    }
+
+
+
+    public void SetDogType(DogType i_DogType)
+    {
+        m_CurrentDogType = i_DogType;
+
+        for (int i = 0; i < m_DogObjects.Length; i++)
+        {
+            if (i == (int)m_CurrentDogType)
+            {
+                m_DogObjects[i].SetActive(true);
+            }
+            else
+            {
+                m_DogObjects[i].SetActive(false);
+            }
+        }
     }
 
 
