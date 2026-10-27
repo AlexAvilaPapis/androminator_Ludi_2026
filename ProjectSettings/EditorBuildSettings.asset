@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/Scenes/Test_Obstacles.unity
-    guid: bc16c15780452034eb49783fa1408750
+    path: Assets/Scenes/Scene_Coche.unity
+    guid: 37a2a53f54cd12245a83056645169322
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 8fd4f8ee6747f4a4ea92ce8784e21e83, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
