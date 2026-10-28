@@ -15,7 +15,7 @@ MonoBehaviour:
   m_SpringPosition: 0.5
   m_SpringFullDistance: 1.125
   m_SpringRestDistance: 0.75
-  m_SpringForce: 100
+  m_SpringForce: 125
   m_SpringDamper: 5
   m_WheelGripFactor: 0.95
   m_WheelWeight: 3

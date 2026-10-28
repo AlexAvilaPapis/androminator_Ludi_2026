@@ -39,7 +39,10 @@ public class DecalProyector : MonoBehaviour
         // RAYCAST TO TERRAIN -----------
         Physics.Raycast(transform.position, Vector3.down, out RaycastHit l_Hit, m_RaycastDistance, m_HitLayerMask);
         if (!l_Hit.transform.name.Equals(m_TerrainName))
+        {
+            Debug.Log("No terrain!");
             return;
+        }
         // ------------------------------
 
 
