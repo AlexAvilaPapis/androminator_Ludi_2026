@@ -17,4 +17,9 @@ public class WheelParams : ScriptableObject
     [Header("Model variables")]
     public Mesh m_WheelMesh;
     public Material m_WheelMaterial;
+
+    [Header("CarV2 variables")]
+    public float m_WheelRadius = 0.5f;
+    public float m_SuspensionRange = 0.25f;
+    [Range(0, 1.0f)] public float m_WheelSlip = 0.5f;
 }

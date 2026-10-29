@@ -68,7 +68,7 @@ public class CarBehaviour : MonoBehaviour
 
     float[] m_SpringPosition;
     float[] m_SpringFullDistance;
-    float[] m_SpringRestDistance;
+    float[] m_WheelRadius;
     float[] m_SpringForce;
     float[] m_SpringDamper;
     Mesh[] m_WheelMesh;
@@ -146,22 +146,34 @@ public class CarBehaviour : MonoBehaviour
         UpdateBodyParams();
         //UpdateWheelParams();
         SetDogType(m_CurrentDogType);
+
+        //m_JumpAcceleration *= 0.3f;
+        //m_JumpFlipForce *= 0.3f;
     }
 
+    private void Update()
+    {
+        ApplyMovementInput();
+        Update_JumpTrigger();
+        Update_FlipTrigger();
+        if (!m_IsGrounded) Update_OnAirRoll();
+    }
     private void FixedUpdate()
     {
-        Update_Jump();
-
         for (int i = 0; i < m_ActiveWheels.Count; i++)
         {
             ApplyForces(i);
         }
 
-        ApplyMovementInput();
-
-        if (!m_IsGrounded) Update_OnAirRoll();
+        //ApplyMovementInput();
+        //if (!m_IsGrounded) Update_OnAirRoll();
+        Update_Jump();
+        Update_Flip();
 
         Update_Deadzone();
+
+        m_WasJumping = m_IsJumping;
+        m_WasFlipping = m_IsFlipping;
     }
 
 
@@ -174,11 +186,11 @@ public class CarBehaviour : MonoBehaviour
 
         if (m_MoveAction.IsPressed() && m_HorizontalInput != 0)
         {
-            m_CurrentWheelAngle += m_MaxWheelAngle * m_HorizontalInput * m_WheelTurnPower * Time.fixedDeltaTime;
+            m_CurrentWheelAngle += m_MaxWheelAngle * m_HorizontalInput * m_WheelTurnPower * Time.deltaTime;
         }
         else if (m_CurrentWheelAngle > 1f || m_CurrentWheelAngle < -1f)
         {
-            m_CurrentWheelAngle += m_MaxWheelAngle * -Mathf.Sign(m_CurrentWheelAngle) * m_WheelTurnPower * Time.fixedDeltaTime;
+            m_CurrentWheelAngle += m_MaxWheelAngle * -Mathf.Sign(m_CurrentWheelAngle) * m_WheelTurnPower * Time.deltaTime;
         }
         else
         {
@@ -218,12 +230,14 @@ public class CarBehaviour : MonoBehaviour
         if (l_IsWheelGrounded)
         {
             // Detect terrain mask color ---------------------------------
+            m_CurrentSpeedMultiplier[i] = 1.0f;
+            m_CurrentAdditionalGrip[i] = 0.0f;
+
             if (m_WheelRayHit[i].transform.name == "Terrain")
             {
                 if (m_TerrainMask != null)
                 {
                     Color l_TerrainMaskColor = m_TerrainMask.GetPixelBilinear(m_WheelRayHit[i].textureCoord.x, m_WheelRayHit[i].textureCoord.y);
-                    //Debug.Log(l_TerrainMaskColor);
 
                     // BLACK
                     m_CurrentSpeedMultiplier[i] = m_GrassSpeedMultiplier;
@@ -241,16 +255,6 @@ public class CarBehaviour : MonoBehaviour
                         m_CurrentAdditionalGrip[i] = Mathf.Lerp(m_CurrentAdditionalGrip[i], m_MudAdditionalGrip, l_TerrainMaskColor.b);
                     }
                 }
-                else
-                {
-                    m_CurrentSpeedMultiplier[i] = 1.0f;
-                    m_CurrentAdditionalGrip[i] = 0.0f;
-                }
-            }
-            else
-            {
-                m_CurrentSpeedMultiplier[i] = 1.0f;
-                m_CurrentAdditionalGrip[i] = 0.0f;
             }
 
             //Debug.Log("Speed mult: " + m_CurrentSpeedMultiplier[i] + " | Add Grip: " + m_CurrentAdditionalGrip[i]);
@@ -264,20 +268,20 @@ public class CarBehaviour : MonoBehaviour
 
             Vector3 l_WheelWorldVelocity = m_CarRigidbody.GetPointVelocity(m_WheelTransform[i].position);
 
-            float l_Offset = m_SpringPosition[i] + m_SpringRestDistance[i] - m_WheelRayHit[i].distance;
+            float l_Offset = m_SpringPosition[i] + m_WheelRadius[i] - m_WheelRayHit[i].distance;
 
             float l_VerticalVelocity = Vector3.Dot(l_SpringDirection, l_WheelWorldVelocity);
 
             float l_ElasticityForce = (l_Offset * m_SpringForce[i]);
             float l_DampingForce = (l_VerticalVelocity * m_SpringDamper[i]);
-            float l_MaxElasticityForce = (m_SpringFullDistance[i] - m_SpringRestDistance[i]) * m_SpringForce[i];    // PRESCINDIBLE
+            float l_MaxElasticityForce = (m_SpringFullDistance[i] - m_WheelRadius[i]) * m_SpringForce[i];    // PRESCINDIBLE
             l_DampingForce = Mathf.Clamp(l_DampingForce, -l_MaxElasticityForce, l_MaxElasticityForce);              // PRESCINDIBLE
 
             float l_SuspensionForce = l_ElasticityForce - l_DampingForce;
 
             m_CarRigidbody.AddForceAtPosition(l_SpringDirection * l_SuspensionForce, m_WheelRayHit[i].point);
 
-            m_WheelMeshTransform[i].position = m_WheelRayHit[i].point + (m_WheelTransform[i].up * (m_SpringRestDistance[i]));
+            m_WheelMeshTransform[i].position = m_WheelRayHit[i].point + (m_WheelTransform[i].up * (m_WheelRadius[i]));
             // -----------------------------------------------------------
 
 
@@ -348,7 +352,7 @@ public class CarBehaviour : MonoBehaviour
             // Rotate wheels ---------------------------------------------
             float l_CarVelocity = Vector3.Dot(m_WheelTransform[i].forward, m_CarRigidbody.linearVelocity);
 
-            m_WheelCurrentRotation[i] += l_CarVelocity / m_SpringRestDistance[i] * Mathf.Rad2Deg * Time.fixedDeltaTime;
+            m_WheelCurrentRotation[i] += l_CarVelocity / m_WheelRadius[i] * Mathf.Rad2Deg * Time.fixedDeltaTime;
 
             m_WheelTransform[i].GetChild(0).localRotation = Quaternion.Euler(m_WheelCurrentRotation[i], 0f, 0f);
             // -----------------------------------------------------------
@@ -376,7 +380,7 @@ public class CarBehaviour : MonoBehaviour
             float l_SpringSpeed = Vector3.Dot(m_WheelTransform[i].up, l_VerticalSpeed);
 
             m_WheelMeshTransform[i].position -= m_WheelTransform[i].up * l_SpringSpeed / m_SpringDamper[i] * Time.fixedDeltaTime;
-            m_WheelMeshTransform[i].localPosition = new Vector3(0, -m_SpringPosition[i], 0) + Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_SpringRestDistance[i]);
+            m_WheelMeshTransform[i].localPosition = new Vector3(0, -m_SpringPosition[i], 0) + Vector3.ClampMagnitude(m_WheelMeshTransform[i].localPosition, m_SpringFullDistance[i] - m_WheelRadius[i]);
             // -----------------------------------------------------------
 
 
@@ -384,7 +388,7 @@ public class CarBehaviour : MonoBehaviour
             // Rotate wheels ---------------------------------------------
             float l_CarHorizontalSpeed = new Vector2(m_CarRigidbody.linearVelocity.x, m_CarRigidbody.linearVelocity.z).magnitude;
 
-            m_WheelCurrentRotation[i] += l_CarHorizontalSpeed * m_CarVelocitySign / m_SpringRestDistance[i] * Mathf.Rad2Deg * Time.fixedDeltaTime;
+            m_WheelCurrentRotation[i] += l_CarHorizontalSpeed * m_CarVelocitySign / m_WheelRadius[i] * Mathf.Rad2Deg * Time.fixedDeltaTime;
 
             m_WheelTransform[i].GetChild(0).localRotation = Quaternion.Euler(m_WheelCurrentRotation[i], 0f, 0f);
             // -----------------------------------------------------------
@@ -485,7 +489,7 @@ public class CarBehaviour : MonoBehaviour
             WheelParams l_WheelParams = m_WheelBehaviour[i].m_WheelParams;
             m_SpringPosition[i] = l_WheelParams.m_SpringPosition;
             m_SpringFullDistance[i] = l_WheelParams.m_SpringFullDistance;
-            m_SpringRestDistance[i] = l_WheelParams.m_SpringRestDistance;
+            m_WheelRadius[i] = l_WheelParams.m_SpringRestDistance;
             m_SpringForce[i] = l_WheelParams.m_SpringForce * 10;
             m_SpringDamper[i] = l_WheelParams.m_SpringDamper * 10;
             m_WheelMesh[i] = l_WheelParams.m_WheelMesh;
@@ -511,7 +515,7 @@ public class CarBehaviour : MonoBehaviour
 
         m_SpringPosition = new float[i];
         m_SpringFullDistance = new float[i];
-        m_SpringRestDistance = new float[i];
+        m_WheelRadius = new float[i];
         m_SpringForce = new float[i];
         m_SpringDamper = new float[i];
         m_WheelMesh = new Mesh[i];
@@ -568,8 +572,11 @@ public class CarBehaviour : MonoBehaviour
     bool m_IsJumping = false;
     bool m_WasJumping = false;
     bool m_JumpTrigger = false;
+    bool m_IsFlipping = false;
+    bool m_WasFlipping = false;
+    bool m_FlipTrigger = false;
     bool m_IsGrounded = false;
-    void Update_Jump()
+    void Update_JumpTrigger()
     {
         bool l_isAllWheelsGrounded = true;
 
@@ -591,32 +598,45 @@ public class CarBehaviour : MonoBehaviour
         m_IsJumping = m_JumpAction.IsPressed() /*&& m_IsGrounded*/;
 
         m_JumpTrigger = m_IsJumping && !m_WasJumping;
+    }
+    void Update_FlipTrigger()
+    {
+        float l_CarVerticalVelocity = m_CarRigidbody.linearVelocity.y;
 
+        m_IsFlipping = l_CarVerticalVelocity == 0 && m_IsColliding;
 
+        m_FlipTrigger = m_IsFlipping && !m_WasFlipping;
+    }
+
+    void Update_Jump()
+    {
+        float l_CarVerticalVelocity = m_CarRigidbody.linearVelocity.y;
 
         // Grounded jump
-        //int l_NumberOfGroundedWheels = 0;
-        for (int i = 0; i < m_ActiveWheels.Count; i++)
+        if (Physics.Raycast(transform.position, -transform.up, m_SpringFullDistance[0] + m_WheelRadius[0], m_CollisionMask))
         {
-            if (Physics.Raycast(m_WheelTransform[i].position, -m_WheelTransform[i].up, m_SpringFullDistance[i] + m_SpringRestDistance[i], m_CollisionMask))
+            if (m_JumpTrigger)
             {
-                //l_NumberOfGroundedWheels++;
-
-                if (m_JumpTrigger)
+                Vector3 l_JumpDirection = transform.up;
+                //m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_TotalWeight * m_JumpAcceleration * 100 / m_ActiveWheels.Count, m_WheelTransform[i].position);
+                //m_CarRigidbody.AddForce(l_JumpDirection * m_TotalWeight * m_JumpAcceleration * 100 / m_ActiveWheels.Count);
+                m_CarRigidbody.AddForce(l_JumpDirection * m_TotalWeight * m_JumpAcceleration * 10);
+                m_CarRigidbody.angularVelocity = Vector3.zero;
+            }
+            for (int i = 0; i < m_ActiveWheels.Count; i++)
+            {
                 {
-                    Vector3 l_JumpDirection = m_WheelTransform[i].up;
-                    //m_CarRigidbody.AddForceAtPosition(l_JumpDirection * m_TotalWeight * m_JumpAcceleration * 100 / m_ActiveWheels.Count, m_WheelTransform[i].position);
-                    m_CarRigidbody.AddForce(l_JumpDirection * m_TotalWeight * m_JumpAcceleration * 100 / m_ActiveWheels.Count);
-                    m_CarRigidbody.angularVelocity = Vector3.zero;
                 }
             }
         }
-        //Debug.Log(l_NumberOfGroundedWheels);
 
 
 
+    }
+    void Update_Flip()
+    {
         // Flip jump
-        if (l_CarVerticalVelocity == 0 && m_IsColliding)
+        if (m_FlipTrigger)
         {
             //Debug.Log("Car is flipped");
             Vector3 l_JumpDirection = Vector3.up;
@@ -627,17 +647,16 @@ public class CarBehaviour : MonoBehaviour
                                                   m_WheelTransform[i].position + m_WheelTransform[i].forward * 1);
             }
         }
-
-
-
-        m_WasJumping = m_IsJumping;
     }
 
     void Update_OnAirRoll()
     {
-        Vector3 l_PitchRotation = transform.right * m_VerticalInput * Time.fixedDeltaTime * 10.0f;
-        Vector3 l_RollRotation = -transform.forward * m_HorizontalInput * Time.fixedDeltaTime * 10.0f;
+        Vector3 l_PitchRotation = transform.right * m_VerticalInput * Time.deltaTime * 10;
+        Vector3 l_RollRotation = -transform.forward * m_HorizontalInput * Time.deltaTime * 10;
         m_CarRigidbody.angularVelocity += l_PitchRotation + l_RollRotation;
+        m_CarRigidbody.angularVelocity = Vector3.ClampMagnitude(m_CarRigidbody.angularVelocity, 5);
+
+        //Debug.Log(m_CarRigidbody.angularVelocity);
     }
 
 

@@ -21,3 +21,6 @@ MonoBehaviour:
   m_WheelWeight: 3
   m_WheelMesh: {fileID: -3922683356484029550, guid: 347ff0507af93f443adb96078b848179, type: 3}
   m_WheelMaterial: {fileID: 2100000, guid: 37633077fd1eabc43ad61d2a38f133de, type: 2}
+  m_WheelRadius: 0.75
+  m_SuspensionRange: 0.5
+  m_WheelSlip: 0.95
